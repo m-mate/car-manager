@@ -1,5 +1,6 @@
 package com.example.car_manager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +16,56 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = "car_data")
 public class CarData {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    private Long id;
+
+    @Column
+    @Getter
+    @Setter
+    private Double speed;
+
+    @Column
+    private Integer rpm;
+
+    @Column(name = "fuel_level")
+    private Double fuelLevel;
+
+    @Column(name = "fuel_rate")
+    private Double fuelRate;
+
+    @Column(name = "time_stamp", nullable = false)
+    private LocalDateTime timeStamp;
+
+    @ManyToOne
+    @JoinColumn(name = "vin", referencedColumnName = "vin")
+    @JsonIgnore
+    private Car car;
+
+    @Override
+    public String toString() {
+        return "CarData{" +
+                "id=" + id +
+                ", speed=" + speed +
+                ", rpm=" + rpm +
+                ", fuelLevel=" + fuelLevel +
+                ", fuelRate=" + fuelRate +
+                ", timeStamp=" + timeStamp +
+                ", car=" + car +
+                '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Double getSpeed() {
         return speed;
     }
@@ -47,14 +98,6 @@ public class CarData {
         this.fuelRate = fuelRate;
     }
 
-    public Car getCar() {
-        return car;
-    }
-
-    public void setCar(Car car) {
-        this.car = car;
-    }
-
     public LocalDateTime getTimeStamp() {
         return timeStamp;
     }
@@ -63,27 +106,12 @@ public class CarData {
         this.timeStamp = timeStamp;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public Car getCar() {
+        return car;
+    }
 
-    private Double speed;
-
-    private Integer rpm;
-
-    @Column(name = "fuel_level")
-    private Double fuelLevel;
-
-    @Column(name = "fuel_rate")
-    private Double fuelRate;
-
-    @Column(name = "time_stamp", nullable = false)
-    private LocalDateTime timeStamp;
-
-    @ManyToOne
-    @JoinColumn(name = "vin", referencedColumnName = "vin")
-    private Car car;
-
-    // Getters and setters
+    public void setCar(Car car) {
+        this.car = car;
+    }
 }
 

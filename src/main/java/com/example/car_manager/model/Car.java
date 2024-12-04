@@ -45,5 +45,16 @@ public class Car {
     @OneToMany(mappedBy = "car")
     private List<Route> routes;
 
-
+    @Override
+    public String toString() {
+        return "Car{" +
+                "id=" + id +
+                ", vin='" + vin + '\'' +
+                ", type='" + type + '\'' +
+                ", carData=" + carData +
+                ", carDataTmp=" + carDataTmp +
+                ", users=" + users +
+                ", routes=" + routes +
+                '}';
+    }
 }

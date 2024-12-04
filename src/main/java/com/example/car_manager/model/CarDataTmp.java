@@ -1,5 +1,6 @@
 package com.example.car_manager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +36,7 @@ public class CarDataTmp {
 
     @ManyToOne
     @JoinColumn(name = "vin", referencedColumnName = "vin")
+    @JsonIgnore
     private Car car;
 
     @PrePersist
@@ -88,6 +90,19 @@ public class CarDataTmp {
 
     public Car getCar() {
         return car;
+    }
+
+    @Override
+    public String toString() {
+        return "CarDataTmp{" +
+                "id=" + id +
+                ", speed=" + speed +
+                ", rpm=" + rpm +
+                ", fuelLevel=" + fuelLevel +
+                ", fuelRate=" + fuelRate +
+                ", timeStamp=" + timeStamp +
+                ", car=" + car +
+                '}';
     }
 }
 

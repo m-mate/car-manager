@@ -5,6 +5,9 @@ import com.example.car_manager.model.CarDataTmp;
 import com.example.car_manager.repo.CarDataRepository;
 import com.example.car_manager.repo.CarDataTmpRepository;
 import com.example.car_manager.repo.CarRepository;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import java.util.List;
 
 @Service
 public class CarDataTmpService {
+    private static final Logger log = LoggerFactory.getLogger(CarDataTmpService.class);
     CarDataTmpRepository carDataTmpRepository;
 
     CarDataRepository carDataRepository;
@@ -32,23 +36,32 @@ public class CarDataTmpService {
         return carDataTmpRepository.findById(id).get();
     }
 
+    @Transactional
     public CarDataTmp saveCarDataTmp(CarDataTmp carDataTmp) {
         // Logger to log errors
         //Logger logger = LoggerFactory.getLogger(CarDataTmpService.class);
 
+
         try {
             // Fetch all temporary data for the same car (VIN)
-            carDataTmp.setCar(carRepository.findByVin(carDataTmp.getCar().getVin()));
+
+
+            //log.info("Save carDataTmp"+ carDataTmp.getCar().toString());
             carDataTmpRepository.save(carDataTmp);
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(carDataTmp.getCar().getVin());
-
+            //log.info("carDataTmpList: {}", carDataTmpList);
             // If there are 60 entries, calculate the average and move the data to CarData
+            log.info("carDataTmpSize: {}", carDataTmpList.size() );
             if (carDataTmpList.size() >= 60) {
                 // Calculate the averages
                 double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
+                log.info("avgSpeed: {}", avgSpeed);
                 int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
+                log.info("avgRpm: {}", avgRpm);
                 double avgFuelLevel = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelLevel).average().orElse(0.0);
+                log.info("avgFuelLevel: {}", avgFuelLevel);
                 double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
+                log.info("avgFuelRate: {}", avgFuelRate);
 
                 // Create a new CarData entry
                 CarData carData = new CarData();
@@ -59,21 +72,23 @@ public class CarDataTmpService {
                 carData.setTimeStamp(carDataTmp.getTimeStamp()); // Use the latest timestamp
                 carData.setCar(carDataTmp.getCar());
 
+
+
+
+                carDataTmpRepository.deleteAllByCar_Vin(carDataTmp.getCar().getVin());
+
                 // Save the averaged CarData entry
                 carDataRepository.save(carData);
-
-                // Delete the processed entries from CarDataTmp
-                carDataTmpRepository.deleteAll(carDataTmpList);
             }
 
             // Return the original carDataTmp object
             return carDataTmp;
 
         } catch (DataAccessException e) {
-            //logger.error("Database error while saving car data: {}", e.getMessage(), e);
+            log.error("Database error while saving car data: {}", e.getMessage(), e);
             throw new RuntimeException("Database error occurred", e);
         } catch (NullPointerException e) {
-            //logger.error("Null pointer error while processing car data: {}", e.getMessage(), e);
+            log.error("Null pointer error while processing car data: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Received null data, please check the inputs.", e);
         } catch (Exception e) {
             //logger.error("Unexpected error while processing car data: {}", e.getMessage(), e);
