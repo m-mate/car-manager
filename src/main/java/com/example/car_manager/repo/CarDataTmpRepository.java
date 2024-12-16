@@ -13,6 +13,9 @@ public interface CarDataTmpRepository extends JpaRepository<CarDataTmp, Long> {
     List<CarDataTmp> findByCar_Vin(String vin);
     void deleteAllByCar_Vin(String vin);
 // Custom delete method
+    @Query("SELECT c FROM CarDataTmp c WHERE c.car.vin = :vin ORDER BY c.timeStamp DESC LIMIT 1")
+    CarDataTmp findLatestByCarVin(@Param("vin") String vin);
+
 
     void deleteAllByCar(Car car);
 

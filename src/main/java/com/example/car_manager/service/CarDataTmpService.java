@@ -50,7 +50,6 @@ public class CarDataTmpService {
             carDataTmpRepository.save(carDataTmp);
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(carDataTmp.getCar().getVin());
             //log.info("carDataTmpList: {}", carDataTmpList);
-            // If there are 60 entries, calculate the average and move the data to CarData
             log.info("carDataTmpSize: {}", carDataTmpList.size() );
             if (carDataTmpList.size() >= 60) {
                 // Calculate the averages
@@ -63,7 +62,6 @@ public class CarDataTmpService {
                 double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
                 log.info("avgFuelRate: {}", avgFuelRate);
 
-                // Create a new CarData entry
                 CarData carData = new CarData();
                 carData.setSpeed(avgSpeed);
                 carData.setRpm(avgRpm);
@@ -77,11 +75,9 @@ public class CarDataTmpService {
 
                 carDataTmpRepository.deleteAllByCar_Vin(carDataTmp.getCar().getVin());
 
-                // Save the averaged CarData entry
                 carDataRepository.save(carData);
             }
 
-            // Return the original carDataTmp object
             return carDataTmp;
 
         } catch (DataAccessException e) {
@@ -94,6 +90,10 @@ public class CarDataTmpService {
             //logger.error("Unexpected error while processing car data: {}", e.getMessage(), e);
             throw new RuntimeException("Unexpected error occurred", e);
         }
+    }
+
+    public CarDataTmp getLatestCarDataTmp(String vin) {
+        return carDataTmpRepository.findLatestByCarVin(vin);
     }
 
     @Autowired
