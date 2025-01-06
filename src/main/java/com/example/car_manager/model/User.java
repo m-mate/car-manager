@@ -56,7 +56,8 @@ public class User {
     }
 
     @Column(name = "role")
-    private Role role = Role.USER;
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.ROLE_USER;
 
     @Column(name = "password")
     private String password;
@@ -67,6 +68,15 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "car_id", referencedColumnName = "id")
     private Car car;
+
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
+
 
     // Getters and setters
 }

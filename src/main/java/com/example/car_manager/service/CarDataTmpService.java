@@ -51,7 +51,7 @@ public class CarDataTmpService {
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(carDataTmp.getCar().getVin());
             //log.info("carDataTmpList: {}", carDataTmpList);
             log.info("carDataTmpSize: {}", carDataTmpList.size() );
-            if (carDataTmpList.size() >= 60) {
+            if (carDataTmpList.size() >= 600) {
                 // Calculate the averages
                 double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
                 log.info("avgSpeed: {}", avgSpeed);
