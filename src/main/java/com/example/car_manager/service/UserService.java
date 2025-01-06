@@ -94,4 +94,7 @@ public class UserService {
         return "Fail";
     }
 
+    public User findByUsername(String username) {
+        userRepository.findByUsername(username);
+    }
 }
