@@ -20,7 +20,7 @@ public class CarDataTmpService {
     CarDataTmpRepository carDataTmpRepository;
 
     CarDataRepository carDataRepository;
-    private CarRepository carRepository;
+    CarRepository carRepository;
 
     @Autowired
     public void setCarDataRepository(CarDataRepository carDataRepository) {

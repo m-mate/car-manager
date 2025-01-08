@@ -40,6 +40,9 @@ public class CarData {
     @Column(name = "time_stamp", nullable = false)
     private LocalDateTime timeStamp;
 
+    @Column(name = "in_route")
+    private Boolean inRoute = false;
+
     @ManyToOne
     @JoinColumn(name = "vin", referencedColumnName = "vin")
     @JsonIgnore
@@ -112,6 +115,14 @@ public class CarData {
 
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    public Boolean getInRoute() {
+        return inRoute;
+    }
+
+    public void setInRoute(Boolean inRoute) {
+        this.inRoute = inRoute;
     }
 }
 
