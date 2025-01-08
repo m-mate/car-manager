@@ -40,4 +40,17 @@ public class CarService {
             throw new RuntimeException("Car not found with ID: " + id);
         }
     }
+
+    public void deleteCar(Integer id) {
+        carRepository.deleteById(id);
+    }
+
+    public Car findByVin(String vin){
+        return carRepository.findByVin(vin);
+    }
+
+    public Car findById(Integer id) {
+        return carRepository.findById(id).get();
+    }
+
 }
