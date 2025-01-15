@@ -31,11 +31,10 @@ public class RouteController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Route>> getAllRoutes(@RequestParam String username, @RequestParam Integer carId) {
-        // Replace the following stubs with actual service methods to fetch User and Car objects
-        User user = userService.findByUsername(username); // Fetch user by userId
+        User user = userService.findByUsername(username);
 
 
-        Car car = carService.findById(carId); // Fetch car by carId
+        Car car = carService.findById(carId); 
 
 
         List<Route> routes = routeService.getAllRoutes(user, car);

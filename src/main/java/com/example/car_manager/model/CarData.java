@@ -31,8 +31,7 @@ public class CarData {
     @Column
     private Integer rpm;
 
-    @Column(name = "fuel_level")
-    private Double fuelLevel;
+
 
     @Column(name = "fuel_rate")
     private Double fuelRate;
@@ -54,7 +53,7 @@ public class CarData {
                 "id=" + id +
                 ", speed=" + speed +
                 ", rpm=" + rpm +
-                ", fuelLevel=" + fuelLevel +
+
                 ", fuelRate=" + fuelRate +
                 ", timeStamp=" + timeStamp +
                 ", car=" + car +
@@ -85,13 +84,7 @@ public class CarData {
         this.rpm = rpm;
     }
 
-    public Double getFuelLevel() {
-        return fuelLevel;
-    }
 
-    public void setFuelLevel(Double fuelLevel) {
-        this.fuelLevel = fuelLevel;
-    }
 
     public Double getFuelRate() {
         return fuelRate;

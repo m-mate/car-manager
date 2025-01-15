@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CarService {
@@ -18,10 +19,13 @@ public class CarService {
     }
 
     public Car save(Car car) {
-        if (carRepository.existsByVin(car.getVin())) {
-            return carRepository.findByVin(car.getVin());
-        }
+        car.setVin(generateRandomVin());
         return carRepository.save(car);
+    }
+
+    private String generateRandomVin() {
+        // VINs are usually 17 characters long, but for simplicity, we'll generate a random UUID and truncate it
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
     }
 
     public Car updateCar(Integer id, Car carDetails) {

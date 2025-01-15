@@ -8,4 +8,6 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
     Car findByVin(String vin);
 
     boolean existsByVin(String vin);
+
+    boolean existsByType(String type);
 }

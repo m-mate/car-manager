@@ -51,21 +51,19 @@ public class CarDataTmpService {
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(carDataTmp.getCar().getVin());
             //log.info("carDataTmpList: {}", carDataTmpList);
             log.info("carDataTmpSize: {}", carDataTmpList.size() );
-            if (carDataTmpList.size() >= 600) {
+            if (carDataTmpList.size() >= 60) {
                 // Calculate the averages
                 double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
                 log.info("avgSpeed: {}", avgSpeed);
                 int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
                 log.info("avgRpm: {}", avgRpm);
-                double avgFuelLevel = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelLevel).average().orElse(0.0);
-                log.info("avgFuelLevel: {}", avgFuelLevel);
+
                 double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
                 log.info("avgFuelRate: {}", avgFuelRate);
 
                 CarData carData = new CarData();
                 carData.setSpeed(avgSpeed);
                 carData.setRpm(avgRpm);
-                carData.setFuelLevel(avgFuelLevel);
                 carData.setFuelRate(avgFuelRate);
                 carData.setTimeStamp(carDataTmp.getTimeStamp()); // Use the latest timestamp
                 carData.setCar(carDataTmp.getCar());
