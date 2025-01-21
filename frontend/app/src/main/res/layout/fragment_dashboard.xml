@@ -1,0 +1,39 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <!-- Speed Gauge -->
+    <com.github.anastr.speedviewlib.SpeedView
+        android:id="@+id/speedometer"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        app:sv_maxSpeed="240"
+        app:sv_unit="km/h"
+        android:text="Speed" />
+
+    <!-- RPM Gauge -->
+    <com.github.anastr.speedviewlib.TubeSpeedometer
+        android:id="@+id/rpm_meter"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        app:sv_maxSpeed="8000"
+        app:sv_unit="RPM"
+        android:text="RPM" />
+
+    <!-- Fuel Level Gauge -->
+    <com.github.anastr.speedviewlib.PointerSpeedometer
+        android:id="@+id/fuel_meter"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_margin="16dp"
+        app:sv_maxSpeed="100"
+        app:sv_unit="%"
+        android:text="Fuel Level" />
+</LinearLayout>
