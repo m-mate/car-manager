@@ -46,8 +46,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
-        return userService.verify(user);
+    public ResponseEntity<String> login(@RequestBody User user) {
+
+        String token = userService.verify(user);
+        if (token != null) {
+            return new ResponseEntity<>(token, HttpStatus.OK); // Return token on successful login
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }
     }
 
     @GetMapping("/{username}")

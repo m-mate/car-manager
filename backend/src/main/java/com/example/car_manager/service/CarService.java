@@ -24,7 +24,6 @@ public class CarService {
     }
 
     private String generateRandomVin() {
-        // VINs are usually 17 characters long, but for simplicity, we'll generate a random UUID and truncate it
         return UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
     }
 

@@ -38,21 +38,16 @@ public class CarDataTmpService {
 
     @Transactional
     public CarDataTmp saveCarDataTmp(CarDataTmp carDataTmp) {
-        // Logger to log errors
-        //Logger logger = LoggerFactory.getLogger(CarDataTmpService.class);
+
 
 
         try {
-            // Fetch all temporary data for the same car (VIN)
 
-
-            //log.info("Save carDataTmp"+ carDataTmp.getCar().toString());
             carDataTmpRepository.save(carDataTmp);
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(carDataTmp.getCar().getVin());
             //log.info("carDataTmpList: {}", carDataTmpList);
             log.info("carDataTmpSize: {}", carDataTmpList.size() );
             if (carDataTmpList.size() >= 60) {
-                // Calculate the averages
                 double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
                 log.info("avgSpeed: {}", avgSpeed);
                 int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
@@ -65,7 +60,7 @@ public class CarDataTmpService {
                 carData.setSpeed(avgSpeed);
                 carData.setRpm(avgRpm);
                 carData.setFuelRate(avgFuelRate);
-                carData.setTimeStamp(carDataTmp.getTimeStamp()); // Use the latest timestamp
+                carData.setTimeStamp(carDataTmp.getTimeStamp()); 
                 carData.setCar(carDataTmp.getCar());
 
 
