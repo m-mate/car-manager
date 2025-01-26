@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -66,6 +67,18 @@ public class CarController {
         Optional<Car> carOptional = Optional.ofNullable(carService.findById(id));
         return carOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<Car>> findById(@PathVariable String username) {
+        List<Car> cars = carService.findByUserName(username);
+
+        if (cars == null || cars.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(cars);
+    }
+
 }
 
 

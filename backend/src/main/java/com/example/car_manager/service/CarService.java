@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,5 +56,7 @@ public class CarService {
     public Car findById(Integer id) {
         return carRepository.findById(id).get();
     }
+
+    public List<Car> findByUserName(String username) { return carRepository.findByUserUsername(username); }
 
 }

@@ -39,8 +39,10 @@ public class Car {
     @OneToMany(mappedBy = "car")
     private List<CarDataTmp> carDataTmp;
 
-    @OneToMany(mappedBy = "car")
-    private List<User> users;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public String getVin() {
         return vin;
@@ -61,7 +63,7 @@ public class Car {
                 ", type='" + type + '\'' +
                 ", carData=" + carData +
                 ", carDataTmp=" + carDataTmp +
-                ", users=" + users +
+                ", users=" + user +
                 ", routes=" + routes +
                 '}';
     }
