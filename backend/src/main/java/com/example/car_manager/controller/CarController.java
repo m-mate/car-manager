@@ -3,6 +3,7 @@ package com.example.car_manager.controller;
 import com.example.car_manager.model.Car;
 import com.example.car_manager.model.CarDataTmp;
 import com.example.car_manager.service.CarService;
+import com.example.car_manager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +16,17 @@ import java.util.Optional;
 public class CarController {
 
     CarService carService;
+    private UserService userService;
 
     @Autowired
     public void setCarService(CarService carService) {
         this.carService = carService;
     }
 
-    @PostMapping("/save")
-    public String add(@RequestBody Car car) {
+    @PostMapping("/save/{username}")
+    public String add(@RequestBody Car car, @PathVariable String username) {
         try {
+            car.setUser(userService.findByUsername(username));
             carService.save(car);
             return "Car added successfully!";
         } catch (Exception e) {
@@ -79,6 +82,10 @@ public class CarController {
         return ResponseEntity.ok(cars);
     }
 
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 }
 
 
