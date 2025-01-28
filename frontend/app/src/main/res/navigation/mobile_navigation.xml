@@ -12,8 +12,8 @@
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
         <action
-            android:id="@+id/action_login_to_home"
-            app:destination="@id/navigation_home" />
+            android:id="@+id/action_login_to_carList"
+            app:destination="@id/carListFragment" />
     </fragment>
 
     <fragment
@@ -24,6 +24,13 @@
         <action
             android:id="@+id/action_register_to_login"
             app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/carListFragment"
+        android:name="com.example.frontend.ui.cars.CarListFragment"
+        android:label="Car List"
+        tools:layout="@layout/fragment_car_list">
     </fragment>
 
     <fragment

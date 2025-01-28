@@ -38,10 +38,31 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14" // Replace with the latest version
     }
 }
 
 dependencies {
+
+    // Core Compose dependencies
+    implementation("androidx.compose.ui:ui:1.5.14")
+    implementation("androidx.compose.material:material:1.5.14")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.14")
+    implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.foundation.android)
+
+    implementation(libs.androidx.material3.android)
+    debugImplementation("androidx.compose.ui:ui-tooling:1.5.14")
+
+    // Activity Compose
+    implementation("androidx.activity:activity-compose:1.7.2")
+
+    // Navigation for Compose (optional, if you want to use it)
+    implementation("androidx.navigation:navigation-compose:2.7.2")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

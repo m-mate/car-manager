@@ -16,6 +16,9 @@ navigationFragmentKtx = "2.6.0"
 navigationUiKtx = "2.6.0"
 retrofitversion = "2.9.0"
 simpleGaugeAndroid = "0.3.1"
+uiAndroid = "1.7.6"
+foundationAndroid = "1.7.6"
+material3Android = "1.3.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +39,9 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 simple-gauge-android = { module = "com.github.Gruzer:simple-gauge-android", version = "placeholder" }
 simple-gauge-android-v031 = { module = "com.github.Gruzer:simple-gauge-android", version.ref = "lifecycleversion" }
 speedviewlib = { module = "com.github.anastr:speedviewlib", version.ref = "lifecycleversion" }
+androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
+androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

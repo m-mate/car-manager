@@ -1,46 +1,48 @@
 package com.example.frontend
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.example.frontend.databinding.ActivityMainBinding
 
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.navigation.fragment.NavHostFragment
+
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityMainBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "onCreate executed")
+        clearToken()
+        setContentView(R.layout.activity_main)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // Find NavHostFragment safely
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                as? NavHostFragment ?: throw IllegalStateException("NavHostFragment not found")
 
-        val navView: BottomNavigationView = binding.navView
-        val navController: NavController = findNavController(R.id.nav_host_fragment_activity_main)
+        val navController = navHostFragment.navController
 
-        // Configure AppBar and BottomNavigationView with Navigation
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
-            )
+        val navGraph = navController.navInflater.inflate(R.navigation.mobile_navigation)
+
+        // Check if the user is logged in
+        val isLoggedIn = isUserLoggedIn()
+        Log.d("MainActivity", "User logged in: $isLoggedIn")
+        navGraph.setStartDestination(
+            if (isLoggedIn) R.id.carListFragment else R.id.loginFragment
         )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
 
-        // Hide BottomNavigationView on LoginFragment
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.loginFragment) {
-                navView.visibility = View.GONE
-            } else {
-                navView.visibility = View.VISIBLE
-            }
-        }
+        navController.graph = navGraph
     }
+
+    private fun isUserLoggedIn(): Boolean {
+        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val isLoggedIn = sharedPreferences.contains("jwt_token")
+        Log.d("MainActivity", "isUserLoggedIn: $isLoggedIn")
+        return isLoggedIn
+    }
+
+    private fun clearToken() {
+        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        sharedPreferences.edit().remove("jwt_token").apply()
+    }
+
 }

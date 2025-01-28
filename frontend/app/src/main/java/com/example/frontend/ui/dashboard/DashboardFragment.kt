@@ -1,5 +1,8 @@
 package com.example.frontend.ui.dashboard
 
+
+
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.frontend.CarApiService
 import com.example.frontend.CarData
 import com.example.frontend.RetrofitClient
 import com.example.frontend.databinding.FragmentDashboardBinding
@@ -49,7 +53,19 @@ class DashboardFragment : Fragment() {
     }
 
     private fun getCarStatus() {
-        RetrofitClient.carApiService.getCarStatus().enqueue(object : Callback<CarData> {
+        // Retrieve JWT token from SharedPreferences
+        val sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("jwt_token", null)
+
+        if (token.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Dynamically create the CarApiService using RetrofitClient
+        val apiService = RetrofitClient.create(token).create(CarApiService::class.java)
+
+        apiService.getCarStatus().enqueue(object : Callback<CarData> {
             override fun onResponse(call: Call<CarData>, response: Response<CarData>) {
                 if (response.isSuccessful) {
                     val carData = response.body()
@@ -58,8 +74,6 @@ class DashboardFragment : Fragment() {
                         binding.speedometer.speedTo(it.speed.toFloat())
                         binding.rpmMeter.speedTo(it.rpm.toFloat())
                         binding.fuelMeter.speedTo(it.fuelLevel.toFloat())
-                        binding.fuelMeter.setTrembleData(0F,20000)
-                        binding.speedometer.setTrembleData(0F,20000)
                     }
                 } else {
                     // Handle the error response
@@ -74,4 +88,5 @@ class DashboardFragment : Fragment() {
         })
     }
 }
+
 
