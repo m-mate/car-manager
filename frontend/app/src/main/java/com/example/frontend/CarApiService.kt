@@ -1,4 +1,5 @@
 package com.example.frontend
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -24,5 +25,6 @@ interface CarApiService {
     @GET("cars/user/{username}")
     fun getCarsByUser(@Path("username") username: String): Call<List<Car>>
 
-
+    @POST("cars/save/{username}")
+    fun saveCar(@Path("username") username: String, @Body car: Car): Call<Void>
 }

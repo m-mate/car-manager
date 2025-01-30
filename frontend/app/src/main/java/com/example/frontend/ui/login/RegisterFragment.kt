@@ -17,7 +17,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RegisterFragment : Fragment() {
+class RegisterFragment : Fragment() {/*
     private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreateView(
@@ -72,5 +72,5 @@ class RegisterFragment : Fragment() {
         })
     }
 
-
+*/
 }

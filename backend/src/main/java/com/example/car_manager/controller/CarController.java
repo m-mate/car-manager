@@ -5,6 +5,7 @@ import com.example.car_manager.model.CarDataTmp;
 import com.example.car_manager.service.CarService;
 import com.example.car_manager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,14 +25,14 @@ public class CarController {
     }
 
     @PostMapping("/save/{username}")
-    public String add(@RequestBody Car car, @PathVariable String username) {
+    public ResponseEntity<String> add(@RequestBody Car car, @PathVariable String username) {
         try {
             car.setUser(userService.findByUsername(username));
             carService.save(car);
-            return "Car added successfully!";
+            return new ResponseEntity<>( HttpStatus.OK);
         } catch (Exception e) {
 
-            return "Error occurred while adding Car: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Something went wrong");
         }
     }
 

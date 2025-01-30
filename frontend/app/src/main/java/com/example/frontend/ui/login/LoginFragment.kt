@@ -22,7 +22,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class LoginFragment : Fragment() {
-    private lateinit var bottomNavigationView: BottomNavigationView
+    /*private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +30,7 @@ class LoginFragment : Fragment() {
     ): View? {
         // Find the BottomNavigationView in the activity's layout
         bottomNavigationView = requireActivity().findViewById(R.id.nav_view)
+
 
         // Hide the Bottom Navigation in LoginFragment
         bottomNavigationView.visibility = View.GONE
@@ -66,6 +67,7 @@ class LoginFragment : Fragment() {
                         // Save token to SharedPreferences
                         val sharedPreferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
                         sharedPreferences.edit().putString("jwt_token", token).apply()
+                        sharedPreferences.edit().putString("username", username).apply()
 
                         Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                         Log.d("LoginFragment", "JWT Token: $token")
@@ -86,7 +88,7 @@ class LoginFragment : Fragment() {
             }
         })
     }
-
+*/
 
 }
 

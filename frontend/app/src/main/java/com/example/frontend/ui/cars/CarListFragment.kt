@@ -1,6 +1,7 @@
 package com.example.frontend.ui.cars
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,7 +25,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CarListFragment : Fragment() {
+class CarListFragment : Fragment() {/*
 
     private lateinit var bottomNavigationView: BottomNavigationView
     private var carList = mutableStateListOf<Car>() // Use mutableStateListOf for Compose
@@ -48,6 +49,8 @@ class CarListFragment : Fragment() {
                     onAddCarClicked = {
                         // Handle "Add Car" action (e.g., navigate to add car screen)
                         Toast.makeText(requireContext(), "Navigate to Add Car screen", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(requireContext(), AddCarActivity::class.java)
+                        startActivity(intent)
                     },
                     onCarClicked = { car ->
                         Toast.makeText(requireContext(), "Car clicked: ${car.type} - VIN: ${car.vin}", Toast.LENGTH_SHORT).show()
@@ -66,12 +69,17 @@ class CarListFragment : Fragment() {
             Toast.makeText(requireContext(), "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
             return
         }
+        val username =  sharedPreferences.getString("username", null)
 
+        if (username.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+            return
+        }
         // Use RetrofitClient with the token
         val apiService = RetrofitClient.create(token).create(CarApiService::class.java)
 
         // Make API call to fetch cars for the user
-        apiService.getCarsByUser("admin") // Replace "admin" with dynamic username if needed
+        apiService.getCarsByUser(username) // Replace "admin" with dynamic username if needed
             .enqueue(object : Callback<List<Car>> {
                 override fun onResponse(call: Call<List<Car>>, response: Response<List<Car>>) {
                     if (response.isSuccessful && response.body() != null) {
@@ -99,5 +107,5 @@ class CarListFragment : Fragment() {
 
         // Optionally, show the BottomNavigationView again when navigating away from LoginFragment
         bottomNavigationView.visibility = View.VISIBLE
-    }
+    }*/
 }
