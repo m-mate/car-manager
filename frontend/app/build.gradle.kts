@@ -49,6 +49,7 @@ android {
 dependencies {
 
     // Core Compose dependencies
+    implementation("com.github.yamin8000.gauge:Gauge:1.0.4")
     implementation("androidx.compose.ui:ui:1.5.14")
     implementation("androidx.compose.material:material:1.5.14")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.14")

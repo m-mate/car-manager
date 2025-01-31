@@ -1,4 +1,6 @@
-package com.example.frontend.ui.carlist
+package com.example.frontend.ui.routes
+
+
 
 import android.content.Context
 import android.widget.Toast
@@ -14,23 +16,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.frontend.Car
-import com.example.frontend.CarApiService
 import com.example.frontend.RetrofitClient
-import kotlinx.coroutines.launch
+import com.example.frontend.CarApiService
+import com.example.frontend.model.Route
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 @Composable
-fun CarListScreen(navController: NavController) {
+fun RoutesScreen(navController: NavController, carId: Int) {
     val context = LocalContext.current
-    val carList = remember { mutableStateListOf<Car>() }
-    val coroutineScope = rememberCoroutineScope()
+    val routes = remember { mutableStateListOf<Route>() }
 
-    // Fetch cars when the screen is launched
-    LaunchedEffect(Unit) {
-        fetchCarsForUser(context, carList)
+    // Fetch routes when the screen is launched
+    LaunchedEffect(carId) {
+        fetchRoutesForCar(context, carId, routes)
     }
 
     Column(
@@ -40,45 +40,45 @@ fun CarListScreen(navController: NavController) {
     ) {
         Button(
             onClick = {
-                navController.navigate("addCar") // Navigate to Add Car Screen
+                Toast.makeText(context, "Live monitoring started!", Toast.LENGTH_SHORT).show()
+                // TODO: Implement live monitoring functionality
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text(text = "Add Car")
+            Text(text = "Start Live Monitoring")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display car list using LazyColumn
-        if (carList.isNotEmpty()) {
+        // Display routes in a LazyColumn
+        if (routes.isNotEmpty()) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(carList) { car ->
-                    CarItem(car = car, onClick = {
-                        navController.navigate("routes/${car.id}")
-                    })
+                items(routes) { route ->
+                    RouteItem(route = route)
                 }
             }
         } else {
-            Text("No cars available", fontSize = 18.sp)
+            Text("No routes available", fontSize = 18.sp)
         }
     }
 }
 
 @Composable
-fun CarItem(car: Car, onClick: () -> Unit) {
+fun RouteItem(route: Route) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable(onClick = onClick)
+            .clickable { /* Handle route click if needed */ }
     ) {
-        Text(text = car.type, fontSize = 18.sp)
-        Text(text = "VIN: ${car.vin}", fontSize = 14.sp)
+        Text(text = "Route ID: ${route.id}", fontSize = 18.sp)
+        Text(text = "Start: ${route.startLocation}", fontSize = 14.sp)
+        Text(text = "End: ${route.endLocation}", fontSize = 14.sp)
     }
 }
 
-// Function to fetch cars from API
-private fun fetchCarsForUser(context: Context, carList: MutableList<Car>) {
+// Function to fetch routes from API
+private fun fetchRoutesForCar(context: Context, carId: Int, routeList: MutableList<Route>) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
     val username = sharedPreferences.getString("username", null)
@@ -89,19 +89,19 @@ private fun fetchCarsForUser(context: Context, carList: MutableList<Car>) {
     }
 
     val apiService = RetrofitClient.create(token).create(CarApiService::class.java)
-    apiService.getCarsByUser(username).enqueue(object : Callback<List<Car>> {
-        override fun onResponse(call: Call<List<Car>>, response: Response<List<Car>>) {
+    apiService.getAllRoutes(username, carId).enqueue(object : Callback<List<Route>> {
+        override fun onResponse(call: Call<List<Route>>, response: Response<List<Route>>) {
             if (response.isSuccessful) {
                 response.body()?.let {
-                    carList.clear()
-                    carList.addAll(it)
+                    routeList.clear()
+                    routeList.addAll(it)
                 }
             } else {
-                Toast.makeText(context, "No cars found or server error.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "No routes found or server error.", Toast.LENGTH_SHORT).show()
             }
         }
 
-        override fun onFailure(call: Call<List<Car>>, t: Throwable) {
+        override fun onFailure(call: Call<List<Route>>, t: Throwable) {
             Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
         }
     })
