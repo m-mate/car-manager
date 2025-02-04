@@ -31,7 +31,7 @@ interface CarApiService {
     @POST("cars/save/{username}")
     fun saveCar(@Path("username") username: String, @Body car: Car): Call<Void>
 
-    @GET("/all")
+    @GET("/routes/all")
     fun getAllRoutes(@Query("username") username: String, @Query("carId") carId: Int): Call<List<Route>>
 
     @POST("users/register")

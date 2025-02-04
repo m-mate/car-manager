@@ -3,6 +3,7 @@ package com.example.frontend.ui.routes
 
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -72,8 +73,8 @@ fun RouteItem(route: Route) {
             .clickable { /* Handle route click if needed */ }
     ) {
         Text(text = "Route ID: ${route.id}", fontSize = 18.sp)
-        Text(text = "Start: ${route.startLocation}", fontSize = 14.sp)
-        Text(text = "End: ${route.endLocation}", fontSize = 14.sp)
+        Text(text = "Start: ${route.startTime}", fontSize = 14.sp)
+        Text(text = "End: ${route.finishTime}", fontSize = 14.sp)
     }
 }
 
@@ -103,6 +104,8 @@ private fun fetchRoutesForCar(context: Context, carId: Int, routeList: MutableLi
 
         override fun onFailure(call: Call<List<Route>>, t: Throwable) {
             Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+            Log.e("Error", "Error occurred: ${t.message}", t)
+
         }
     })
 }

@@ -1,6 +1,7 @@
 package com.example.car_manager.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,7 +55,8 @@ public class Car {
         this.vin = vin;
     }
 
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Route> routes;
 
     @Override

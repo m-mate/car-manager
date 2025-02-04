@@ -1,5 +1,6 @@
 package com.example.car_manager.controller;
 
+import com.example.car_manager.dto.CarDto;
 import com.example.car_manager.model.Car;
 import com.example.car_manager.model.CarDataTmp;
 import com.example.car_manager.service.CarService;
@@ -73,15 +74,25 @@ public class CarController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<Car>> findById(@PathVariable String username) {
+    public ResponseEntity<List<CarDto>> findById(@PathVariable String username) {
         List<Car> cars = carService.findByUserName(username);
 
         if (cars == null || cars.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(cars);
+        // Convert Car entities to CarDto
+        List<CarDto> carDtos = cars.stream().map(car -> {
+            CarDto dto = new CarDto();
+            dto.setId(car.getId().longValue()); // Ensure correct type conversion
+            dto.setVin(car.getVin());
+            dto.setType(car.getType());
+            return dto;
+        }).toList();
+
+        return ResponseEntity.ok(carDtos);
     }
+
 
     @Autowired
     public void setUserService(UserService userService) {
