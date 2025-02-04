@@ -3,6 +3,7 @@ import com.example.frontend.model.Route
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -16,7 +17,8 @@ interface CarApiService {
     @POST("/api/car/status")
     fun sendCarStatus(@Body carData: CarData): Call<String>
 
-
+    @DELETE("/cars/{id}")
+    fun deleteCar(@Path("id") id: Int): Call<Void>
 
 
 
@@ -32,6 +34,6 @@ interface CarApiService {
     @GET("/all")
     fun getAllRoutes(@Query("username") username: String, @Query("carId") carId: Int): Call<List<Route>>
 
-    @POST("/register")
+    @POST("users/register")
     fun registerUser(@Body user: User): Call<User>
 }

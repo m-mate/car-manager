@@ -78,7 +78,7 @@ fun saveCar(car: Car, context: Context,  navController: NavController) {
         return
     }
 
-    val apiService = RetrofitClient.create(token).create(CarApiService::class.java)
+    val apiService = RetrofitClient.create(context,token).create(CarApiService::class.java)
     apiService.saveCar(username,car).enqueue(object : Callback<Void> {
         override fun onResponse(call: Call<Void>, response: Response<Void>) {
             val responseBody = response.body()

@@ -1,7 +1,5 @@
 package com.example.frontend.ui.dashboard
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -12,11 +10,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import com.github.yamin8000.gauge.main.Gauge
-import com.github.yamin8000.gauge.*
 import com.example.frontend.CarData
+import com.github.yamin8000.gauge.main.Gauge
 import com.github.yamin8000.gauge.main.GaugeNumerics
 import com.github.yamin8000.gauge.ui.color.GaugeArcColors
 import com.github.yamin8000.gauge.ui.color.GaugeNeedleColors
@@ -24,30 +20,22 @@ import com.github.yamin8000.gauge.ui.color.GaugeTicksColors
 import com.github.yamin8000.gauge.ui.style.GaugeArcStyle
 import com.github.yamin8000.gauge.ui.style.GaugeNeedleStyle
 import com.github.yamin8000.gauge.ui.style.GaugeStyle
+import kotlinx.coroutines.delay
 import java.text.DecimalFormat
 
 @Composable
 fun DashboardScreen(navController: NavHostController) {
-    // MutableState to hold the car data
+    // Mutable state for holding car data
     var carData by remember { mutableStateOf<CarData?>(null) }
 
-    // Handler to fetch data every second
-    val handler = remember { Handler(Looper.getMainLooper()) }
-    /*val updateRunnable: Runnable = remember {
-        object : Runnable {
-            override fun run() {
-
-                fetchCarData { fetchedData ->
-                    carData = fetchedData
-                }
-                handler.postDelayed(this, 1000) // Repeat every 1000 ms (1 second)
-            }
-        }
-    }
-*/
-    // Start fetching data when the composable is first composed
+    // Simulate fetching car data every second
     LaunchedEffect(Unit) {
-        //handler.post(updateRunnable)
+        while (true) {
+            fetchCarData { fetchedData ->
+                carData = fetchedData
+            }
+            delay(1000) // Fetch every 1 second
+        }
     }
 
     // Dashboard layout
@@ -61,14 +49,14 @@ fun DashboardScreen(navController: NavHostController) {
         // Row for Speed and RPM Gauges side by side
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SpeedometerView(speed = carData?.speed ?: 0f, modifier = Modifier.weight(1f))
-            RPMView(rpm = carData?.rpm ?: 0f, modifier = Modifier.weight(1f))
+            SpeedometerView(speed = 200.2365F)
+            RPMView(rpm = 2500F)
         }
 
-        // Fuel Level and Coolant Temperature Text below the gauges
+        // Fuel Level and Coolant Temperature
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -87,166 +75,75 @@ fun DashboardScreen(navController: NavHostController) {
     }
 }
 
-
-
+// Speedometer Gauge
 @Composable
-fun SpeedometerView(speed: Number, modifier: Modifier = Modifier) {
+fun SpeedometerView(speed: Float) {
     Gauge(
-        modifier = Modifier.padding(8.dp),
-        value = 55.35f,
+        modifier = Modifier.size(200.dp),
+        value = speed,
         valueUnit = "km/h",
         decimalFormat = DecimalFormat().apply { maximumFractionDigits = 1 },
-        totalSize = 500.dp,
-        borderInset = 16.dp,
+        totalSize = 250.dp,
         numerics = GaugeNumerics(
             startAngle = 150,
             sweepAngle = 240,
-            valueRange = 0f..220f,
-            smallTicksStep = 1,
+            valueRange = 0f..240f,
+            smallTicksStep = 10,
             bigTicksStep = 20
         ),
-        style = GaugeStyle(
-            hasBorder = true,
-            hasValueText = true,
-            borderWidth = 10f,
-            arcStyle = GaugeArcStyle(
-                hasArcs = true,
-                hasProgressiveAlpha = false,
-                bigTicksHasLabels = true,
-                cap = StrokeCap.Square
-            ),
-            needleStyle = GaugeNeedleStyle(
-                hasNeedle = true,
-                tipHasCircle = true,
-                hasRing = true,
-                ringWidth = 10f
-            )
-        ),
+        style = defaultGaugeStyle(),
         borderColor = Color(0xFFFFAB00),
         centerCircleColor = Color(0xFFFF6D00),
-        valueColor = Color(0xFFFFD600),
-        needleColors = GaugeNeedleColors(
-            needle = Color(0xFFFFD600),
-            ring = Color(0xFFFF6D00)
-        ),
-        arcColors = GaugeArcColors(
-            off = Color(0xFFFFD600),
-            on = Color(0xFF00C853)
-        ),
-        ticksColors = GaugeTicksColors(
-            smallTicks = Color(0xFFFF6D00),
-            bigTicks = Color(0xFFDD2C00),
-            bigTicksLabels = Color(0xFFFFAB00)
-        ),
-        arcColorsProvider = { colors, gaugeValue, range ->
-            when (gaugeValue) {
-                in range.start..range.endInclusive / 4 -> GaugeArcColors(
-                    colors.off,
-                    Color.Red
-                )
-
-                in range.endInclusive / 4..range.endInclusive / 2 -> GaugeArcColors(
-                    colors.off,
-                    Color.Yellow
-                )
-
-                in range.endInclusive / 2..range.endInclusive * 3 / 4 -> GaugeArcColors(
-                    colors.off,
-                    Color(0xFFFF8000)
-                )
-
-                else -> GaugeArcColors(colors.off, Color.Green)
-            }
-        },
-        ticksColorProvider = {
-            it.map { pair ->
-                if (pair.first % 15 == 0)
-                    pair.first to Color(0xFF2962FF)
-                else pair
-            }
-        }
+        valueColor = Color(0xFFFFD600)
     )
 }
 
-
+// RPM Gauge
 @Composable
-fun RPMView(rpm: Number, modifier: Modifier = Modifier) {
+fun RPMView(rpm: Float) {
     Gauge(
-        modifier = Modifier.padding(8.dp),
-        value = 55.35f,
-        valueUnit = "rpm",
+        modifier = Modifier.size(200.dp),
+        value = rpm,
+        valueUnit = "RPM",
         decimalFormat = DecimalFormat().apply { maximumFractionDigits = 1 },
-        totalSize = 500.dp,
-        borderInset = 16.dp,
+        totalSize = 250.dp,
         numerics = GaugeNumerics(
             startAngle = 150,
             sweepAngle = 240,
-            valueRange = 0f..6000f,
-            smallTicksStep = 1,
-            bigTicksStep = 20
+            valueRange = 0f..8000f,
+            smallTicksStep = 500,
+            bigTicksStep = 1000
         ),
-        style = GaugeStyle(
-            hasBorder = true,
-            hasValueText = true,
-            borderWidth = 10f,
-            arcStyle = GaugeArcStyle(
-                hasArcs = true,
-                hasProgressiveAlpha = false,
-                bigTicksHasLabels = true,
-                cap = StrokeCap.Square
-            ),
-            needleStyle = GaugeNeedleStyle(
-                hasNeedle = true,
-                tipHasCircle = true,
-                hasRing = true,
-                ringWidth = 10f
-            )
-        ),
+        style = defaultGaugeStyle(),
         borderColor = Color(0xFFFFAB00),
         centerCircleColor = Color(0xFFFF6D00),
-        valueColor = Color(0xFFFFD600),
-        needleColors = GaugeNeedleColors(
-            needle = Color(0xFFFFD600),
-            ring = Color(0xFFFF6D00)
-        ),
-        arcColors = GaugeArcColors(
-            off = Color(0xFFFFD600),
-            on = Color(0xFF00C853)
-        ),
-        ticksColors = GaugeTicksColors(
-            smallTicks = Color(0xFFFF6D00),
-            bigTicks = Color(0xFFDD2C00),
-            bigTicksLabels = Color(0xFFFFAB00)
-        ),
-        arcColorsProvider = { colors, gaugeValue, range ->
-            when (gaugeValue) {
-                in range.start..range.endInclusive / 4 -> GaugeArcColors(
-                    colors.off,
-                    Color.Red
-                )
-
-                in range.endInclusive / 4..range.endInclusive / 2 -> GaugeArcColors(
-                    colors.off,
-                    Color.Yellow
-                )
-
-                in range.endInclusive / 2..range.endInclusive * 3 / 4 -> GaugeArcColors(
-                    colors.off,
-                    Color(0xFFFF8000)
-                )
-
-                else -> GaugeArcColors(colors.off, Color.Green)
-            }
-        },
-        ticksColorProvider = {
-            it.map { pair ->
-                if (pair.first % 15 == 0)
-                    pair.first to Color(0xFF2962FF)
-                else pair
-            }
-        }
+        valueColor = Color(0xFFFFD600)
     )
 }
 
+// Common Gauge Style
+@Composable
+fun defaultGaugeStyle(): GaugeStyle {
+    return GaugeStyle(
+        hasBorder = true,
+        hasValueText = true,
+        borderWidth = 10f,
+        arcStyle = GaugeArcStyle(
+            hasArcs = true,
+            hasProgressiveAlpha = false,
+            bigTicksHasLabels = true,
+            cap = StrokeCap.Round
+        ),
+        needleStyle = GaugeNeedleStyle(
+            hasNeedle = true,
+            tipHasCircle = true,
+            hasRing = true,
+            ringWidth = 10f
+        )
+    )
+}
 
+// Simulated Function to Fetch Data (Replace with API call)
+fun fetchCarData(callback: (CarData) -> Unit) {
 
+}

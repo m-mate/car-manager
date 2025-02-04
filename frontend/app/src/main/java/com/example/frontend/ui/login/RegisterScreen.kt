@@ -89,7 +89,7 @@ fun RegisterScreen(navController: NavHostController) {
 
 private fun handleRegister(username: String, email: String, password: String, context: Context, navController: NavHostController) {
     val user = User(username, password, email)
-    val apiService = RetrofitClient.create("").create(CarApiService::class.java)
+    val apiService = RetrofitClient.create(context,"").create(CarApiService::class.java)
 
     apiService.registerUser(user).enqueue(object : Callback<User> {
         override fun onResponse(call: Call<User>, response: Response<User>) {

@@ -41,7 +41,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
         Button(
             onClick = {
                 Toast.makeText(context, "Live monitoring started!", Toast.LENGTH_SHORT).show()
-                // TODO: Implement live monitoring functionality
+                navController.navigate("dashboard")
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -88,7 +88,7 @@ private fun fetchRoutesForCar(context: Context, carId: Int, routeList: MutableLi
         return
     }
 
-    val apiService = RetrofitClient.create(token).create(CarApiService::class.java)
+    val apiService = RetrofitClient.create(context,token).create(CarApiService::class.java)
     apiService.getAllRoutes(username, carId).enqueue(object : Callback<List<Route>> {
         override fun onResponse(call: Call<List<Route>>, response: Response<List<Route>>) {
             if (response.isSuccessful) {

@@ -6,16 +6,24 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -53,20 +61,57 @@ fun MainNavigation() {
     val navController = rememberNavController()
     val startDestination = if (isUserLoggedIn()) "carList" else "login"
     var showBottomNav by remember { mutableStateOf(true) }
+    var showBackButton by remember { mutableStateOf(false) }
+    var showMenuButton by remember { mutableStateOf(false) }
+    var menuExpanded by remember { mutableStateOf(false) }
+
+
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Car Manager") }, // Set title
+                title = { Text("Car Manager") },
                 backgroundColor = MaterialTheme.colors.primary,
-                contentColor = MaterialTheme.colors.onPrimary
+                contentColor = MaterialTheme.colors.onPrimary,
+                navigationIcon = if (showBackButton) {
+                    {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                } else null,
+                actions = {
+                    if (showMenuButton) {
+                        IconButton(onClick = { menuExpanded = true }) {
+                            Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+                        }
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
+                            DropdownMenuItem(onClick = { /* Handle user settings */ }) {
+                                Text("User Settings")
+                            }
+                            DropdownMenuItem(onClick = { navController.navigate("carList") { popUpTo("carList") { inclusive = true } } }) {
+                                Text("Change Car")
+                            }
+                            DropdownMenuItem(onClick = {
+                                //clearToken()
+                                navController.navigate("login") { popUpTo("login") { inclusive = true } }
+                            }) {
+                                Text("Log Out")
+                            }
+                        }
+                    }
+                }
             )
         },
         bottomBar = {
             if (showBottomNav) {
-                BottomNavigationBar(navController)
+                BottomNavigationBar(navController, LocalContext.current)
             }
         }
+
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -74,19 +119,22 @@ fun MainNavigation() {
             modifier = Modifier.padding(innerPadding) // Ensure content is not hidden
         ) {
             composable("home") { CarListScreen(navController) }
-            composable("dashboard") { DashboardScreen(navController) }
+            composable("dashboard") {showBackButton = true; showBottomNav = false; DashboardScreen(navController) }
             //composable("notifications") { NotificationsScreen(navController) }
-            composable("login") {showBottomNav = false; LoginScreen(navController)}
+            composable("login") {showBottomNav = false; showMenuButton = false; LoginScreen(navController)}
             composable("register") { RegisterScreen(navController) }
-            composable("carList") {showBottomNav = true; CarListScreen(navController) }
+            composable("carList") {showBottomNav = false; showMenuButton = false; CarListScreen(navController) }
             composable("addCar") { AddCarScreen(navController) }
             composable("routes/{carId}") { backStackEntry ->
             val carId = backStackEntry.arguments?.getString("carId")?.toIntOrNull() ?: 0
-            RoutesScreen(navController, carId)
+                showBackButton = false; showMenuButton = true; showBottomNav = true; RoutesScreen(navController, carId)
             }
         }
     }
 }
+
+
+
 
 @Composable
 fun isUserLoggedIn(): Boolean {

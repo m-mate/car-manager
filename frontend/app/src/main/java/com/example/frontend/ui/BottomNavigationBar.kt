@@ -1,5 +1,6 @@
 package com.example.frontend.ui
 
+import android.content.Context
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -16,9 +17,11 @@ import androidx.compose.material.icons.filled.Settings
 
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(navController: NavController, context: Context) {
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val carId = sharedPreferences.getInt("carId", 0)
     val items = listOf(
-        BottomNavItem("home", Icons.Default.Home, "Home"),
+        BottomNavItem("routes/${carId}", Icons.Default.Home, "Home"),
         BottomNavItem("dashboard", Icons.Filled.Settings, "Dashboard"),
         BottomNavItem("notifications", Icons.Default.Notifications, "Notifications")
     )

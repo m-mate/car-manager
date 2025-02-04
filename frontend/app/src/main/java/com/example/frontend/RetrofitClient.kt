@@ -1,5 +1,7 @@
 package com.example.frontend
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -7,7 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://10.0.2.2:8080"
+
+    //private const val BASE_URL = "http://10.0.2.2:8080"
 
     // Create a Gson instance with lenient parsing enabled
     private val gson = GsonBuilder()
@@ -15,7 +18,10 @@ object RetrofitClient {
         .create()
 
     // Function to create a Retrofit instance with a token
-    fun create(token: String): Retrofit {
+    fun create(context: Context, token: String): Retrofit {
+        val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val baseUrl = sharedPreferences.getString("server_address", "http://10.0.2.2:8080") // Default fallback
+
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
@@ -26,7 +32,7 @@ object RetrofitClient {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl ?: "http://10.0.2.2:8080") // Ensure a non-null value
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(client)
             .build()
