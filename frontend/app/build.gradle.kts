@@ -55,7 +55,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.14")
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.foundation.android)
-
+    implementation("io.github.ehsannarmani:compose-charts:0.1.1")
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.viewbinding)
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.14")

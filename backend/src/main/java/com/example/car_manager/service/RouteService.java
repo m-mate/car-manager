@@ -1,5 +1,6 @@
 package com.example.car_manager.service;
 
+import com.example.car_manager.dto.RouteDetailsDTO;
 import com.example.car_manager.model.Car;
 import com.example.car_manager.model.CarData;
 import com.example.car_manager.model.Route;
@@ -173,15 +174,23 @@ public class RouteService {
 
 
 
-    public List<CarData> getRouteDetails(Long routeId) {
+    public RouteDetailsDTO getRouteDetails(Long routeId) {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RuntimeException("Route not found"));
 
-        return carDataRepository.findByCarAndTimeStampBetween(
+        System.out.println("Car VIN: " + route.getCar().getVin());
+        System.out.println("Start Time: " + route.getStartTime());
+        System.out.println("Finish Time: " + route.getFinishTime());
+
+
+
+        List<CarData> carDataList = carDataRepository.findByCarAndTimeStampBetween(
                 route.getCar(),
                 route.getStartTime(),
                 route.getFinishTime()
         );
+        
+        return new RouteDetailsDTO(route, carDataList);
     }
 
 }

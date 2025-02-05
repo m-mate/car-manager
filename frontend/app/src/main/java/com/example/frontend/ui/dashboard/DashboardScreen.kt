@@ -62,12 +62,12 @@ fun DashboardScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Fuel Level: ${carData?.fuelLevel ?: 0}%",
+                text = "Fuel Level: ${carData?.fuelRate ?: 0}%",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Coolant Temp: ${carData?.coolantTemp ?: 0}°C",
+                text = "Coolant Temp: ${carData?.fuelRate ?: 0}°C",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )

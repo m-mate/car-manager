@@ -1,5 +1,6 @@
 package com.example.frontend
 import com.example.frontend.model.Route
+import com.example.frontend.model.RouteDetails
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -20,6 +21,8 @@ interface CarApiService {
     @DELETE("/cars/{id}")
     fun deleteCar(@Path("id") id: Int): Call<Void>
 
+    @GET("/routes/{routeId}/details")
+    fun getRouteDetails(@Path("routeId") routeId: Int): Call<RouteDetails>
 
 
     @POST("/users/login")

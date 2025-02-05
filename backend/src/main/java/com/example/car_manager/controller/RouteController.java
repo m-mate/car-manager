@@ -1,6 +1,7 @@
 package com.example.car_manager.controller;
 
 
+import com.example.car_manager.dto.RouteDetailsDTO;
 import com.example.car_manager.model.Car;
 import com.example.car_manager.model.CarData;
 import com.example.car_manager.model.Route;
@@ -42,8 +43,8 @@ public class RouteController {
     }
 
     @GetMapping("/{routeId}/details")
-    public ResponseEntity<List<CarData>> getRouteDetails(@PathVariable Long routeId) {
-        List<CarData> routeDetails = routeService.getRouteDetails(routeId);
+    public ResponseEntity<RouteDetailsDTO> getRouteDetails(@PathVariable Long routeId) {
+        RouteDetailsDTO routeDetails = routeService.getRouteDetails(routeId);
         return ResponseEntity.ok(routeDetails);
     }
 

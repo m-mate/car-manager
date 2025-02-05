@@ -35,6 +35,7 @@ import com.example.frontend.ui.register.RegisterScreen
 import com.example.frontend.ui.carlist.CarListScreen
 import com.example.frontend.ui.cars.AddCarScreen
 import com.example.frontend.ui.dashboard.DashboardScreen
+import com.example.frontend.ui.routes.RouteDetailsScreen
 import com.example.frontend.ui.routes.RoutesScreen
 
 class MainActivity : ComponentActivity() {
@@ -125,6 +126,10 @@ fun MainNavigation() {
             composable("register") { RegisterScreen(navController) }
             composable("carList") {showBottomNav = false; showMenuButton = false; CarListScreen(navController) }
             composable("addCar") { AddCarScreen(navController) }
+            composable("routeDetails/{routeId}"){backStackEntry ->
+                val routeId = backStackEntry.arguments?.getString("routeId")?.toIntOrNull() ?: 0
+                showBackButton = true; showMenuButton = true; showBottomNav = true; RouteDetailsScreen(navController, routeId)
+            }
             composable("routes/{carId}") { backStackEntry ->
             val carId = backStackEntry.arguments?.getString("carId")?.toIntOrNull() ?: 0
                 showBackButton = false; showMenuButton = true; showBottomNav = true; RoutesScreen(navController, carId)

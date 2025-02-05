@@ -55,7 +55,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
         if (routes.isNotEmpty()) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(routes) { route ->
-                    RouteItem(route = route)
+                    RouteItem(route = route, navController)
                 }
             }
         } else {
@@ -65,12 +65,12 @@ fun RoutesScreen(navController: NavController, carId: Int) {
 }
 
 @Composable
-fun RouteItem(route: Route) {
+fun RouteItem(route: Route, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { /* Handle route click if needed */ }
+            .clickable { navController.navigate("routeDetails/${route.id}") }
     ) {
         Text(text = "Route ID: ${route.id}", fontSize = 18.sp)
         Text(text = "Start: ${route.startTime}", fontSize = 14.sp)
