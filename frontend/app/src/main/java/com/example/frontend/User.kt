@@ -2,7 +2,7 @@ package com.example.frontend
 
 data class User(
     val username: String,
-    val password: String,
+    val password: String = "",
     val email: String = "",
     val role: String? = null
 )

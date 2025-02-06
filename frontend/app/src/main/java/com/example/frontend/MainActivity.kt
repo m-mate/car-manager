@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -66,14 +67,18 @@ fun MainNavigation() {
     var showBackButton by remember { mutableStateOf(false) }
     var showMenuButton by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
-
+    val CustomPrimaryColor = Color(0xff949494)
+    val CustomSecondaryColor = Color(0xFF03DAC6)
+    val CustomBackgroundColor = Color(0xFFF5F5F5)
+    val CustomOnPrimaryColor = Color(0xFFFFFFFF)
+    val CustomOnBackgroundColor = Color(0xFF000000)
 
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Car Manager") },
-                backgroundColor = MaterialTheme.colors.primary,
+                backgroundColor = CustomPrimaryColor,
                 contentColor = MaterialTheme.colors.onPrimary,
                 navigationIcon = if (showBackButton) {
                     {
@@ -98,7 +103,7 @@ fun MainNavigation() {
                                 Text("Change Car")
                             }
                             DropdownMenuItem(onClick = {
-                                menuExpanded = false;
+                                menuExpanded = false
                                 navController.navigate("login") { popUpTo("login") { inclusive = true } }
                             }) {
                                 Text("Log Out")

@@ -3,7 +3,12 @@ package com.example.frontend.ui.user
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +20,7 @@ import com.example.frontend.RetrofitClient
 import com.example.frontend.User
 import com.example.frontend.CarApiService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,14 +30,16 @@ import retrofit2.Response
 fun UserScreen(navController: NavHostController) {
     val context = LocalContext.current
     var user by remember { mutableStateOf<User?>(null) }
+    var allUsers by remember { mutableStateOf<List<User>>(emptyList()) } // Stores all users for admin
+    var isAdmin by remember { mutableStateOf(false) }
 
-    // Initialize with empty strings to avoid null
+    // User details
     var usernameState by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var emailState by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") } // Error message to display in the UI
+    var errorMessage by remember { mutableStateOf("") }
 
     // Fetch user when the screen loads
     LaunchedEffect(Unit) {
@@ -39,6 +47,10 @@ fun UserScreen(navController: NavHostController) {
         user?.let {
             usernameState = it.username
             emailState = it.email
+            isAdmin = it.role == "ROLE_ADMIN" // Check if the user is an admin
+            if (isAdmin) {
+                allUsers = fetchAllUsers(context) // Fetch all users if admin
+            }
         } ?: run {
             errorMessage = "Failed to load user data."
         }
@@ -76,7 +88,6 @@ fun UserScreen(navController: NavHostController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
@@ -111,8 +122,104 @@ fun UserScreen(navController: NavHostController) {
                 Text("Save Changes")
             }
         }
+
+        if (isAdmin) {
+            Text(text = "All Users", style = MaterialTheme.typography.h6, modifier = Modifier.padding(top = 16.dp))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(allUsers) { user ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = 4.dp
+                    ) {
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            // Row layout to position the user details and the buttons (delete, change role)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween, // Spacing between the elements
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // User details wrapped in Column and taking up space
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(text = "Username: ${user.username}")
+                                    Text(text = "Email: ${user.email}")
+                                    Text(text = "Role: ${user.role}")
+                                }
+
+                                // Row with the two buttons: Delete and Change Role
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between the buttons
+                                ) {
+                                    // Delete Button
+                                    IconButton(onClick = { /* Add delete functionality here */ }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Delete User",
+                                            tint = MaterialTheme.colors.error
+                                        )
+                                    }
+
+                                    // Change Role Button
+                                    IconButton(onClick = { /* Add change role functionality here */ }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit, // Use an appropriate icon here
+                                            contentDescription = "Change Role",
+                                            tint = MaterialTheme.colors.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
+
+suspend fun fetchAllUsers(context: Context): List<User> {
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val token = sharedPreferences.getString("jwt_token", null)
+
+    if (token.isNullOrEmpty()) {
+        // Show a toast and return empty list if token is missing
+        withContext(Dispatchers.Main) {
+            Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        }
+        return emptyList()
+    }
+
+    return try {
+        val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
+
+        // Using withContext(Dispatchers.IO) to perform the network request in a background thread
+        val response = withContext(Dispatchers.IO) {
+            apiService.getAllUsers().execute()
+        }
+
+        if (response.isSuccessful) {
+            response.body() ?: emptyList()
+        } else {
+            // Handle the failure scenario
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Failed to fetch users. Error: ${response.code()}", Toast.LENGTH_SHORT).show()
+            }
+            emptyList()
+        }
+    } catch (e: Exception) {
+        // Handle the exception
+        withContext(Dispatchers.Main) {
+            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+        emptyList()
+    }
+}
+
+
 
 suspend fun fetchUser(context: Context): User? {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
@@ -148,6 +255,8 @@ suspend fun fetchUser(context: Context): User? {
     }
 }
 
+
+
 private fun updateUser(context: Context,  password: String, email: String) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
@@ -160,9 +269,9 @@ private fun updateUser(context: Context,  password: String, email: String) {
     val updatedUser = User(username, password, email)
 
     try {
-        println("Start")
+
         val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
-        println("Start2")
+
         apiService.updateUser(username, updatedUser).enqueue(object : Callback<User> {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
@@ -182,5 +291,6 @@ private fun updateUser(context: Context,  password: String, email: String) {
 
     } catch (e: Exception) {
         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+
     }
 }

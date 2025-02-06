@@ -47,4 +47,7 @@ interface CarApiService {
 
     @PUT("users/{username}")
     fun updateUser(@Path("username") username: String, @Body user: User): Call<User>
+
+    @GET("/users/all")
+    fun getAllUsers(): Call<List<User>>
 }
