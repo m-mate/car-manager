@@ -189,7 +189,7 @@ public class RouteService {
                 route.getStartTime(),
                 route.getFinishTime()
         );
-        
+
         return new RouteDetailsDTO(route, carDataList);
     }
 

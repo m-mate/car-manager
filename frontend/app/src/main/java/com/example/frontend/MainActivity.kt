@@ -37,6 +37,7 @@ import com.example.frontend.ui.cars.AddCarScreen
 import com.example.frontend.ui.dashboard.DashboardScreen
 import com.example.frontend.ui.routes.RouteDetailsScreen
 import com.example.frontend.ui.routes.RoutesScreen
+import com.example.frontend.ui.user.UserScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +53,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun clearToken() {
-        val sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
         sharedPreferences.edit().remove("jwt_token").apply()
     }
 }
@@ -90,14 +91,14 @@ fun MainNavigation() {
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false }
                         ) {
-                            DropdownMenuItem(onClick = { /* Handle user settings */ }) {
+                            DropdownMenuItem(onClick = {menuExpanded = false; navController.navigate("user")  }) {
                                 Text("User Settings")
                             }
-                            DropdownMenuItem(onClick = { navController.navigate("carList") { popUpTo("carList") { inclusive = true } } }) {
+                            DropdownMenuItem(onClick = {menuExpanded = false; navController.navigate("carList") { popUpTo("carList") { inclusive = true } } }) {
                                 Text("Change Car")
                             }
                             DropdownMenuItem(onClick = {
-                                //clearToken()
+                                menuExpanded = false;
                                 navController.navigate("login") { popUpTo("login") { inclusive = true } }
                             }) {
                                 Text("Log Out")
@@ -125,7 +126,8 @@ fun MainNavigation() {
             composable("login") {showBottomNav = false; showMenuButton = false; LoginScreen(navController)}
             composable("register") { RegisterScreen(navController) }
             composable("carList") {showBottomNav = false; showMenuButton = false; CarListScreen(navController) }
-            composable("addCar") { AddCarScreen(navController) }
+            composable("addCar") { showBackButton = true;  AddCarScreen(navController) }
+            composable("user") { showBackButton = true;  UserScreen(navController) }
             composable("routeDetails/{routeId}"){backStackEntry ->
                 val routeId = backStackEntry.arguments?.getString("routeId")?.toIntOrNull() ?: 0
                 showBackButton = true; showMenuButton = true; showBottomNav = true; RouteDetailsScreen(navController, routeId)
@@ -144,7 +146,7 @@ fun MainNavigation() {
 @Composable
 fun isUserLoggedIn(): Boolean {
     val sharedPreferences =
-        androidx.compose.ui.platform.LocalContext.current.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        LocalContext.current.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     return sharedPreferences.contains("jwt_token")
 }
 

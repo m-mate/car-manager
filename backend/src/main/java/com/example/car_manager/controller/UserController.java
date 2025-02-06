@@ -1,5 +1,6 @@
 package com.example.car_manager.controller;
 
+import com.example.car_manager.dto.UserDTO;
 import com.example.car_manager.model.User;
 import com.example.car_manager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,23 @@ public class UserController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<User> updateUser(@PathVariable String username, @RequestBody User user) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String username, @RequestBody User user) {
         try {
+            // Update the user
             User updatedUser = userService.updateUser(username, user);
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+
+            // Convert User to UserDTO
+            UserDTO userDTO = new UserDTO(
+                    updatedUser.getId(),
+                    updatedUser.getUsername(),
+                    updatedUser.getEmail(),
+                    updatedUser.getRole()
+            );
+
+            // Return the UserDTO
+            return new ResponseEntity<>(userDTO, HttpStatus.OK);
         } catch (RuntimeException e) {
+            // Handle error if user not found or any exception
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -57,12 +70,13 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        User user = userService.findByUsername(username);
-        try {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+        User user = userService.findByUsername(username);  // Assuming you have a service to fetch user
+        if (user != null) {
+            UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+            return ResponseEntity.ok(userDTO);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }

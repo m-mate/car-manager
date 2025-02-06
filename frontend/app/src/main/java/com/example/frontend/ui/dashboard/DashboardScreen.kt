@@ -1,12 +1,15 @@
 package com.example.frontend.ui.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,20 +28,19 @@ import java.text.DecimalFormat
 
 @Composable
 fun DashboardScreen(navController: NavHostController) {
-    // Mutable state for holding car data
     var carData by remember { mutableStateOf<CarData?>(null) }
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
 
-    // Simulate fetching car data every second
     LaunchedEffect(Unit) {
         while (true) {
             fetchCarData { fetchedData ->
                 carData = fetchedData
             }
-            delay(1000) // Fetch every 1 second
+            delay(1000)
         }
     }
 
-    // Dashboard layout
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,73 +48,88 @@ fun DashboardScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Row for Speed and RPM Gauges side by side
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SpeedometerView(speed = 200.2365F)
-            RPMView(rpm = 2500F)
-        }
+        if (isPortrait) {
+            // Portrait layout (vertical)
+            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                modifier = Modifier
+                    .background(
+                        color = Color.Gray,
+                        shape = RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp, bottomStart = 150.dp, bottomEnd = 150.dp) // Fully rounded top
+                    )
+                    .padding(16.dp)
+            ) {
+                SpeedometerView(speed = 100.2365F)
 
-        // Fuel Level and Coolant Temperature
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Fuel Level: ${carData?.fuelRate ?: 0}%",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Coolant Temp: ${carData?.fuelRate ?: 0}°C",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+                Text("Fuel Level: ${carData?.fuelRate ?: 0}%")
+                Text("Coolant Temp: ${carData?.fuelRate ?: 0}°C")
+                RPMView(rpm = 2.5F)
+
+            }
+        } else {
+            // Landscape layout (horizontal)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = Color.Gray,
+                        shape = RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp, bottomStart = 150.dp, bottomEnd = 150.dp)
+                    ),
+
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SpeedometerView(speed = 100.2365F)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Fuel Level: ${carData?.fuelRate ?: 0}%")
+                    Text("Coolant Temp: ${carData?.fuelRate ?: 0}°C")
+                }
+                RPMView(rpm = 2.5F)
+            }
         }
     }
 }
 
-// Speedometer Gauge
 @Composable
 fun SpeedometerView(speed: Float) {
-    Gauge(
-        modifier = Modifier.size(200.dp),
-        value = speed,
-        valueUnit = "km/h",
-        decimalFormat = DecimalFormat().apply { maximumFractionDigits = 1 },
-        totalSize = 250.dp,
-        numerics = GaugeNumerics(
-            startAngle = 150,
-            sweepAngle = 240,
-            valueRange = 0f..240f,
-            smallTicksStep = 10,
-            bigTicksStep = 20
-        ),
-        style = defaultGaugeStyle(),
-        borderColor = Color(0xFFFFAB00),
-        centerCircleColor = Color(0xFFFF6D00),
-        valueColor = Color(0xFFFFD600)
-    )
+     // Increased size
+        Gauge(
+            modifier = Modifier.size(250.dp),
+            value = speed,
+            valueUnit = "km/h",
+            decimalFormat = DecimalFormat().apply { maximumFractionDigits = 1 },
+            totalSize = 250.dp,  // Increased from 200dp
+            numerics = GaugeNumerics(
+                startAngle = 90,
+                sweepAngle = 270,
+                valueRange = 0f..220f,
+                smallTicksStep = 1,
+                bigTicksStep = 20
+            ),
+            style = defaultGaugeStyle(),
+            borderColor = Color(0xFFFFAB00),
+            centerCircleColor = Color(0xFFFF6D00),
+            valueColor = Color(0xFFFFD600)
+        )
+
 }
 
-// RPM Gauge
+
+
 @Composable
 fun RPMView(rpm: Float) {
     Gauge(
-        modifier = Modifier.size(200.dp),
+        modifier = Modifier.size(250.dp) ,
         value = rpm,
         valueUnit = "RPM",
         decimalFormat = DecimalFormat().apply { maximumFractionDigits = 1 },
         totalSize = 250.dp,
         numerics = GaugeNumerics(
-            startAngle = 150,
-            sweepAngle = 240,
-            valueRange = 0f..8000f,
-            smallTicksStep = 500,
-            bigTicksStep = 1000
+            startAngle = 90,
+            sweepAngle = 270,
+            valueRange = 0f..8f,
+            smallTicksStep = 1,
+            bigTicksStep = 1
         ),
         style = defaultGaugeStyle(),
         borderColor = Color(0xFFFFAB00),
@@ -121,7 +138,6 @@ fun RPMView(rpm: Float) {
     )
 }
 
-// Common Gauge Style
 @Composable
 fun defaultGaugeStyle(): GaugeStyle {
     return GaugeStyle(
@@ -143,7 +159,6 @@ fun defaultGaugeStyle(): GaugeStyle {
     )
 }
 
-// Simulated Function to Fetch Data (Replace with API call)
 fun fetchCarData(callback: (CarData) -> Unit) {
-
+    // Simulated data fetching function
 }
