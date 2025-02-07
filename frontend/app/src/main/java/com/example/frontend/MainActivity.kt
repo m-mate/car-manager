@@ -78,7 +78,7 @@ fun MainNavigation() {
         topBar = {
             TopAppBar(
                 title = { Text("Car Manager") },
-                backgroundColor = CustomPrimaryColor,
+                backgroundColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.onPrimary,
                 navigationIcon = if (showBackButton) {
                     {

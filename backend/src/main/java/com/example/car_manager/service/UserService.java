@@ -1,8 +1,10 @@
 package com.example.car_manager.service;
 
 import com.example.car_manager.dto.UserDTO;
+import com.example.car_manager.model.Role;
 import com.example.car_manager.model.User;
 import com.example.car_manager.repo.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,6 +51,7 @@ public class UserService {
 
     }
 
+    @Transactional
     public void deleteUser(Long id){
         userRepository.deleteById(id);
     }
@@ -72,10 +75,22 @@ public class UserService {
                 existingUser.setLastName(user.getLastName());
             }
 
+
             return userRepository.save(existingUser);
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    public User changeRole(Integer id){
+        User user = userRepository.findById(id).get();
+        if(user.getRole() == Role.ROLE_ADMIN){
+            user.setRole(Role.ROLE_USER);
+        }else {
+            user.setRole(Role.ROLE_ADMIN);
+        }
+        userRepository.save(user);
+        return user;
     }
 
     public List<UserDTO> getAllUsers() {

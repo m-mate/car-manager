@@ -50,4 +50,10 @@ interface CarApiService {
 
     @GET("/users/all")
     fun getAllUsers(): Call<List<User>>
+
+    @DELETE("users/delete/{id}")
+    fun deleteUser(@Path("id") userId: Int): Call<Void>
+
+    @PUT("users/change-role/{id}")
+    fun changeUserRole(@Path("id") userId: Int): Call<User>
 }

@@ -12,10 +12,12 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.frontend.Car
 import com.example.frontend.RetrofitClient
 import com.example.frontend.User
 import com.example.frontend.CarApiService
@@ -30,9 +32,9 @@ import retrofit2.Response
 fun UserScreen(navController: NavHostController) {
     val context = LocalContext.current
     var user by remember { mutableStateOf<User?>(null) }
-    var allUsers by remember { mutableStateOf<List<User>>(emptyList()) } // Stores all users for admin
+    var allUsers = remember { mutableStateListOf<User>() }
     var isAdmin by remember { mutableStateOf(false) }
-
+    var showDialog by remember { mutableStateOf(false) }
     // User details
     var usernameState by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -40,16 +42,19 @@ fun UserScreen(navController: NavHostController) {
     var emailState by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var currentUserId by remember { mutableStateOf(1) }
 
     // Fetch user when the screen loads
     LaunchedEffect(Unit) {
         user = fetchUser(context)
         user?.let {
+            currentUserId = it.id!!
             usernameState = it.username
             emailState = it.email
             isAdmin = it.role == "ROLE_ADMIN" // Check if the user is an admin
             if (isAdmin) {
-                allUsers = fetchAllUsers(context) // Fetch all users if admin
+                allUsers.clear()
+                allUsers.addAll( fetchAllUsers(context) )
             }
         } ?: run {
             errorMessage = "Failed to load user data."
@@ -123,6 +128,50 @@ fun UserScreen(navController: NavHostController) {
             }
         }
 
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Confirm Deletion") },
+                text = { Text("Are you sure you want to delete your profile? This action cannot be undone.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showDialog = false
+                            deleteUser(
+                                context,
+                                userList = allUsers,
+                                userId = currentUserId,
+                                currentUserId = currentUserId,
+                                navController = navController
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+                    ) {
+                        Text("Delete", color = Color.White)
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
+        Button(
+            onClick = { showDialog = true },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
+            } else {
+                Text("Delete Profile", color = Color.White)
+            }
+        }
+
         if (isAdmin) {
             Text(text = "All Users", style = MaterialTheme.typography.h6, modifier = Modifier.padding(top = 16.dp))
 
@@ -154,7 +203,10 @@ fun UserScreen(navController: NavHostController) {
                                     horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between the buttons
                                 ) {
                                     // Delete Button
-                                    IconButton(onClick = { /* Add delete functionality here */ }) {
+                                    IconButton(onClick = { user.id?.let {
+                                        deleteUser(context,allUsers ,
+                                            it, currentUserId, navController)
+                                    } }) {
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = "Delete User",
@@ -163,7 +215,11 @@ fun UserScreen(navController: NavHostController) {
                                     }
 
                                     // Change Role Button
-                                    IconButton(onClick = { /* Add change role functionality here */ }) {
+                                    IconButton(onClick = { user.id?.let {
+                                        changeRole(context, allUsers ,
+                                            it
+                                        )
+                                    } }) {
                                         Icon(
                                             imageVector = Icons.Default.Edit, // Use an appropriate icon here
                                             contentDescription = "Change Role",
@@ -181,42 +237,102 @@ fun UserScreen(navController: NavHostController) {
     }
 }
 
-suspend fun fetchAllUsers(context: Context): List<User> {
+suspend fun fetchAllUsers(context: Context): MutableList<User> {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
 
     if (token.isNullOrEmpty()) {
-        // Show a toast and return empty list if token is missing
         withContext(Dispatchers.Main) {
             Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
         }
-        return emptyList()
+        return mutableListOf()
     }
 
     return try {
         val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
 
-        // Using withContext(Dispatchers.IO) to perform the network request in a background thread
         val response = withContext(Dispatchers.IO) {
             apiService.getAllUsers().execute()
         }
 
         if (response.isSuccessful) {
-            response.body() ?: emptyList()
+            response.body()?.toMutableList() ?: mutableListOf()
         } else {
-            // Handle the failure scenario
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "Failed to fetch users. Error: ${response.code()}", Toast.LENGTH_SHORT).show()
             }
-            emptyList()
+            mutableListOf()
         }
     } catch (e: Exception) {
-        // Handle the exception
         withContext(Dispatchers.Main) {
             Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
         }
-        emptyList()
+        mutableListOf()
     }
+}
+
+
+private fun deleteUser(context: Context,userList:MutableList<User> ,userId: Int, currentUserId: Int, navController: NavHostController) {
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val token = sharedPreferences.getString("jwt_token", null)
+
+    if (token.isNullOrEmpty()) {
+        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
+    apiService.deleteUser(userId).enqueue(object : Callback<Void> {
+        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            if (response.isSuccessful) {
+                if(userId == currentUserId){
+                    navController.navigate("login")
+                }else{
+                    userList.removeAll { it.id == userId }
+                }
+                Toast.makeText(context, "Car deleted successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete car", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        override fun onFailure(call: Call<Void>, t: Throwable) {
+            Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+        }
+    })
+    }
+
+private fun changeRole(context: Context, userList: MutableList<User>, userId: Int) {
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val token = sharedPreferences.getString("jwt_token", null)
+
+    if (token.isNullOrEmpty()) {
+        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
+    apiService.changeUserRole(userId).enqueue(object : Callback<User> {
+        override fun onResponse(call: Call<User>, response: Response<User>) {
+            if (response.isSuccessful) {
+                val updatedUser = response.body()
+                if (updatedUser != null) {
+                    // Find and update the user in the list
+                    val index = userList.indexOfFirst { it.id == userId }
+                    if (index != -1) {
+                        userList[index] = updatedUser
+                    }
+                }
+                Toast.makeText(context, "User role changed successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to change user role: ${response.code()}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        override fun onFailure(call: Call<User>, t: Throwable) {
+            Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+        }
+    })
 }
 
 
