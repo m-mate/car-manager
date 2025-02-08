@@ -16,6 +16,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -38,37 +39,41 @@ fun BottomNavigationBar(navController: NavController, context: Context) {
     val carId = sharedPreferences.getInt("carId", 0)
 
     // Creating a Button for "Dashboard" with rounded top corners
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-             // Optional padding around the button
-            .clip(RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp)) // Rounded top corners
-            .background(MaterialTheme.colors.primary) // Background color of the button
-    ) {
-        Button(
-            onClick = {
-                // Navigate to the Dashboard route
-                navController.navigate("dashboard")
-            },
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp), // Adjust height as needed
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
+                // Optional padding around the button
+                .clip(RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp)) // Rounded top corners
+                .background(MaterialTheme.colors.primary) // Background color of the button
+
+
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize()
+            Button(
+                onClick = {
+                    // Navigate to the Dashboard route
+                    navController.navigate("dashboard")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                , // Adjust height as needed
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
             ) {
-                Icon(
-                    Icons.Filled.PlayArrow,
-                    contentDescription = "Dashboard",
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text("Start Live Monitoring")
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = "Dashboard",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Start Live Monitoring")
+                }
             }
         }
-    }
+
 }
 
 data class BottomNavItem(val route: String, val icon: ImageVector, val label: String)

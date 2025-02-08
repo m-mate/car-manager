@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -35,7 +36,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
 
     // Fetch routes when the screen is launched
     LaunchedEffect(carId) {
-        fetchRoutesForCar(navController,context, carId, routes)
+        fetchRoutesForCar(navController, context, carId, routes)
     }
 
     Column(
@@ -43,54 +44,84 @@ fun RoutesScreen(navController: NavController, carId: Int) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Row(
+
+        // Title Row with Background, Shadow, and Refresh Button
+        Surface(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            color = MaterialTheme.colors.primary, // Background color for the row
+            elevation = 8.dp, // Shadow effect to elevate the row
+            shape = RoundedCornerShape(8.dp) // Rounded corners for the row background
         ) {
-            Text(text = "My Routes", style = MaterialTheme.typography.h6)
-
-            Button(
-                onClick = { refreshRoutes(navController, context, carId, routes) }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp), // Padding inside the row
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    Icons.Filled.Refresh,
-                    contentDescription = "Refresh Routes",
-
-                    //modifier = Modifier.padding(end = 8.dp)
+                Text(
+                    text = "My Routes",
+                    style = MaterialTheme.typography.h6,
+                    color = MaterialTheme.colors.onPrimary // Ensures the text is visible on the primary background
                 )
-                //Text(text = "Refresh Routes")
+
+                Button(
+                    onClick = { refreshRoutes(navController, context, carId, routes) },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
+                ) {
+                    Icon(
+                        Icons.Filled.Refresh,
+                        contentDescription = "Refresh Routes",
+                        tint = MaterialTheme.colors.onSecondary // Ensure icon is visible on button
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp)) // Spacer between header and LazyColumn
 
         // Display routes in a LazyColumn
-        if (routes.isNotEmpty()) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(routes) { route ->
-                    RouteItem(route = route, navController)
-                }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp) // Add space between items
+        ) {
+            items(routes) { route ->
+                RouteItem(route = route, navController)
             }
-        } else {
-            Text("No routes available", fontSize = 18.sp)
+        }
+
+        // If there are no routes
+        if (routes.isEmpty()) {
+            Spacer(modifier = Modifier.weight(1f)) // Make sure the "No routes" text is aligned
+            Text("No routes available", fontSize = 18.sp, style = MaterialTheme.typography.body1)
         }
     }
 }
-
 
 @Composable
 fun RouteItem(route: Route, navController: NavController) {
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { navController.navigate("routeDetails/${route.id}") }
+            .clickable { navController.navigate("routeDetails/${route.id}") },
+        shape = RoundedCornerShape(8.dp), // Rounded corners for the card
+        elevation = 16.dp // Shadow effect for the card
     ) {
-        Text(text = "Route ID: ${route.id}", fontSize = 18.sp)
-        Text(text = "Start: ${route.startTime}", fontSize = 14.sp)
-        Text(text = "End: ${route.finishTime}", fontSize = 14.sp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp) // Padding inside the card
+        ) {
+            Text(text = "Route ID: ${route.id}", fontSize = 18.sp, style = MaterialTheme.typography.h6)
+            Spacer(modifier = Modifier.height(4.dp)) // Space between text
+            Text(text = "Start: ${route.startTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
+            Spacer(modifier = Modifier.height(4.dp)) // Space between text
+            Text(text = "End: ${route.finishTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
+        }
     }
 }
+
+
 
 // Function to fetch routes from API
 private fun fetchRoutesForCar(navController: NavController, context: Context, carId: Int, routeList: MutableList<Route>) {
