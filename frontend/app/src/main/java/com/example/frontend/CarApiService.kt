@@ -1,7 +1,7 @@
 package com.example.frontend
+import com.example.frontend.model.CarDataLive
 import com.example.frontend.model.Route
 import com.example.frontend.model.RouteDetails
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -13,8 +13,11 @@ import retrofit2.http.Query
 
 interface CarApiService {
 
-    @GET("/get/vin1")
-    fun getCarStatus(): Call<CarData>
+    @GET("/server/ping")
+    fun pingServer(): Call<String>
+
+    @GET("get/{vin}")
+    fun getCarStatus(@Path("vin") vin: String): Call<CarDataLive>
 
     @POST("/api/car/status")
     fun sendCarStatus(@Body carData: CarData): Call<String>
@@ -56,4 +59,8 @@ interface CarApiService {
 
     @PUT("users/change-role/{id}")
     fun changeUserRole(@Path("id") userId: Int): Call<User>
+
+    @POST("routes/check/{username}/{carId}")
+    fun refreshRoutes(@Path("username") username: String, @Path("carId") carId: Int): Call<Void>
+
 }

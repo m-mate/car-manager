@@ -31,65 +31,10 @@ public class RouteService {
     }
 
     public List<Route> getAllRoutes(User user, Car car) {
-        checkForNewRoute(user, car);
+        //checkForNewRoute(user, car);
         return routeRepository.findByUserAndCar(user, car);
     }
-    /*
-    public void checkForNewRoute(User user, Car car) {
-        List<CarData> carDataList = carDataRepository.findByCarAndInRouteFalseOrderByTimeStampAsc(car);
-        List<Route> newRoutes = new ArrayList<>();
-        int count = 0;
-        int speed = 0;
-        int fuelRate = 0;
-        if (carDataList.isEmpty()) {
-            return;
-        }
 
-        Route currentRoute = null;
-        LocalDateTime previousTimestamp = null;
-
-        for (CarData carData : carDataList) {
-            if (previousTimestamp == null ||
-                    Duration.between(previousTimestamp, carData.getTimeStamp()).toMinutes() > 30) {
-                if (currentRoute != null) {
-                    currentRoute.setFinishTime(previousTimestamp.toLocalTime());
-                    newRoutes.add(currentRoute);
-                }
-
-                currentRoute = new Route();
-                currentRoute.setStartTime(carData.getTimeStamp().toLocalTime());
-                currentRoute.setCar(car);
-                currentRoute.setUser(user);
-                count += 1;
-                speed += carData.getSpeed();
-                fuelRate += carData.getFuelRate();
-            }
-
-            carData.setInRoute(true);
-            carDataRepository.save(carData);
-            previousTimestamp = carData.getTimeStamp();
-        }
-
-
-        if (currentRoute != null) {
-            currentRoute.setFinishTime(previousTimestamp.toLocalTime());
-            long totalMinutes = Duration.between(currentRoute.getStartTime(), currentRoute.getFinishTime()).toMinutes();
-            double hours = totalMinutes / 60.0;
-            int avgSpeed =  Math.round((float) speed /count);
-            currentRoute.setAvgSpeed(avgSpeed);
-            currentRoute.setDistanceTraveled((int) (avgSpeed * hours));
-            double avgFuelRate = (double) fuelRate / count;
-            currentRoute.setAvgFuelConsumption(avgFuelRate);
-            currentRoute.setFuelUsed(avgFuelRate * hours);
-            newRoutes.add(currentRoute);
-        }
-         count = 0;
-         speed = 0;
-         fuelRate = 0;
-
-        routeRepository.saveAll(newRoutes);
-    }
-    */
 
     public void checkForNewRoute(User user, Car car) {
         List<CarData> carDataList = carDataRepository.findByCarAndInRouteFalseOrderByTimeStampAsc(car);

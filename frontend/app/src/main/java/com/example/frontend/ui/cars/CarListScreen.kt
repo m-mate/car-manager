@@ -32,7 +32,7 @@ fun CarListScreen(navController: NavController) {
 
     // Fetch cars when the screen is launched
     LaunchedEffect(Unit) {
-        fetchCarsForUser(context, carList)
+        fetchCarsForUser(navController,context, carList)
     }
 
     Column(
@@ -61,10 +61,11 @@ fun CarListScreen(navController: NavController) {
                             val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
                             if (car.id != null){
                             sharedPreferences.edit().putInt("carId", car.id).apply()
+                                sharedPreferences.edit().putString("vin", car.vin).apply()
                             navController.navigate("routes/${car.id}")
                             }
                                   },
-                        onDelete = { car.id?.let { deleteCar(context, it, carList) } } // Pass delete function
+                        onDelete = { car.id?.let { deleteCar(navController, context, it, carList) } } // Pass delete function
                     )
                 }
             }
@@ -137,7 +138,7 @@ fun CarItem(car: Car, onClick: () -> Unit, onDelete: () -> Unit) {
 
 
 // Function to fetch cars from API
-private fun fetchCarsForUser(context: Context, carList: MutableList<Car>) {
+private fun fetchCarsForUser(navController: NavController, context: Context, carList: MutableList<Car>) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
     val username = sharedPreferences.getString("username", null)
@@ -155,8 +156,15 @@ private fun fetchCarsForUser(context: Context, carList: MutableList<Car>) {
                     carList.clear()
                     carList.addAll(it)
                 }
+            } else if (response.code() == 401) {
+                sharedPreferences.edit().remove("jwt_token").apply()
+                sharedPreferences.edit().clear().apply()
+                Toast.makeText(context, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+                navController.navigate("login") {
+                    popUpTo("dashboard") { inclusive = true } // Clear backstack
+                }
             } else {
-                Toast.makeText(context, "No cars found or server error.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "No routes found or server error.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -167,7 +175,7 @@ private fun fetchCarsForUser(context: Context, carList: MutableList<Car>) {
 }
 
 // Function to delete a car
-private fun deleteCar(context: Context, carId: Int, carList: MutableList<Car>) {
+private fun deleteCar(navController: NavController, context: Context, carId: Int, carList: MutableList<Car>) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
 
@@ -182,8 +190,15 @@ private fun deleteCar(context: Context, carId: Int, carList: MutableList<Car>) {
             if (response.isSuccessful) {
                 carList.removeAll { it.id == carId } // Remove deleted car from list
                 Toast.makeText(context, "Car deleted successfully", Toast.LENGTH_SHORT).show()
+            } else if (response.code() == 401) {
+                sharedPreferences.edit().remove("jwt_token").apply()
+                sharedPreferences.edit().clear().apply()
+                Toast.makeText(context, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+                navController.navigate("login") {
+                    popUpTo("dashboard") { inclusive = true } // Clear backstack
+                }
             } else {
-                Toast.makeText(context, "Failed to delete car", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "No routes found or server error.", Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -25,7 +25,15 @@ public class CarDataTmp {
 
     private Integer rpm;
 
+    private Integer coolantTemp;
 
+    public Integer getCoolantTemp() {
+        return coolantTemp;
+    }
+
+    public void setCoolantTemp(Integer coolantTemp) {
+        this.coolantTemp = coolantTemp;
+    }
 
     @Column(name = "fuel_rate")
     private Double fuelRate;

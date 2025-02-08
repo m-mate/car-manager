@@ -86,8 +86,15 @@ fun saveCar(car: Car, context: Context,  navController: NavController) {
 
                     navController.navigate("carList")
 
+            }else if (response.code() == 401) {
+                sharedPreferences.edit().remove("jwt_token").apply()
+                sharedPreferences.edit().clear().apply()
+                Toast.makeText(context, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+                navController.navigate("login") {
+                    popUpTo("dashboard") { inclusive = true } // Clear backstack
+                }
             } else {
-                Toast.makeText(context, "No cars found or server error.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "No routes found or server error.", Toast.LENGTH_SHORT).show()
             }
         }
 

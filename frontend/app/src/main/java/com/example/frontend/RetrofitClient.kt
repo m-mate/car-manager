@@ -20,7 +20,7 @@ object RetrofitClient {
     // Function to create a Retrofit instance with a token
     fun create(context: Context, token: String): Retrofit {
         val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        val baseUrl = sharedPreferences.getString("server_address", "http://10.0.2.2:8080") // Default fallback
+        val baseUrl = sharedPreferences.getString("server_address", "") // Default fallback
 
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->

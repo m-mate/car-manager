@@ -1,5 +1,11 @@
 package com.example.frontend.ui.dashboard
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,31 +16,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.frontend.CarData
+import com.example.frontend.CarApiService
+import com.example.frontend.RetrofitClient
+import com.example.frontend.model.CarDataLive
 import com.github.yamin8000.gauge.main.Gauge
 import com.github.yamin8000.gauge.main.GaugeNumerics
-import com.github.yamin8000.gauge.ui.color.GaugeArcColors
-import com.github.yamin8000.gauge.ui.color.GaugeNeedleColors
-import com.github.yamin8000.gauge.ui.color.GaugeTicksColors
 import com.github.yamin8000.gauge.ui.style.GaugeArcStyle
 import com.github.yamin8000.gauge.ui.style.GaugeNeedleStyle
 import com.github.yamin8000.gauge.ui.style.GaugeStyle
 import kotlinx.coroutines.delay
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.DecimalFormat
 
 @Composable
 fun DashboardScreen(navController: NavHostController) {
-    var carData by remember { mutableStateOf<CarData?>(null) }
+    var carData by remember { mutableStateOf<CarDataLive?>(null) }
     val configuration = LocalConfiguration.current
+    val context = LocalContext.current
+    val sharedPreferences = remember { context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE) }
+    val token = remember { sharedPreferences.getString("jwt_token", null) }
+    val vin = remember { sharedPreferences.getString("vin", null) }
     val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+
+    if (token.isNullOrEmpty() || vin.isNullOrEmpty()) {
+        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        return
+    }
 
     LaunchedEffect(Unit) {
         while (true) {
-            fetchCarData { fetchedData ->
+            fetchCarData(context, token, vin ) { fetchedData ->
                 carData = fetchedData
             }
             delay(1000)
@@ -59,11 +75,20 @@ fun DashboardScreen(navController: NavHostController) {
                     )
                     .padding(16.dp)
             ) {
-                SpeedometerView(speed = 100.2365F)
+                val animatedSpeed by animateFloatAsState(
+                    targetValue = carData?.speed?.toFloat() ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                SpeedometerView(speed = animatedSpeed)
 
                 Text("Fuel Level: ${carData?.fuelRate ?: 0}%")
-                Text("Coolant Temp: ${carData?.fuelRate ?: 0}°C")
-                RPMView(rpm = 2.5F)
+                Text("Coolant Temp: ${carData?.coolantTemp ?: 0}°C")
+                val animatedRPM by animateFloatAsState(
+                    targetValue = carData?.rpm?.div(1000f) ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                RPMView(rpm = animatedRPM)
+
 
             }
         } else {
@@ -79,12 +104,21 @@ fun DashboardScreen(navController: NavHostController) {
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SpeedometerView(speed = 100.2365F)
+                val animatedSpeed by animateFloatAsState(
+                    targetValue = carData?.speed?.toFloat() ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                SpeedometerView(speed = animatedSpeed)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Fuel Level: ${carData?.fuelRate ?: 0}%")
-                    Text("Coolant Temp: ${carData?.fuelRate ?: 0}°C")
+                    Text("Coolant Temp: ${carData?.coolantTemp ?: 0}°C")
                 }
-                RPMView(rpm = 2.5F)
+                val animatedRPM by animateFloatAsState(
+                    targetValue = carData?.rpm?.div(1000f) ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                RPMView(rpm = animatedRPM)
+
             }
         }
     }
@@ -159,6 +193,30 @@ fun defaultGaugeStyle(): GaugeStyle {
     )
 }
 
-fun fetchCarData(callback: (CarData) -> Unit) {
-    // Simulated data fetching function
+fun fetchCarData(context: Context, token: String, vin: String, callback: (CarDataLive) -> Unit) {
+
+
+    if (token.isEmpty() || vin.isEmpty()) {
+        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
+
+    apiService.getCarStatus(vin).enqueue(object : Callback<CarDataLive> {
+        override fun onResponse(call: Call<CarDataLive>, response: Response<CarDataLive>) {
+            if (response.isSuccessful) {
+                response.body()?.let { carData ->
+                    callback(carData) // Pass data to UI
+                } ?: Log.e("fetchCarData", "Response body is null")
+            } else {
+                Log.e("fetchCarData", "Error: ${response.code()} ${response.message()}")
+            }
+        }
+
+        override fun onFailure(call: Call<CarDataLive>, t: Throwable) {
+            Log.e("fetchCarData", "Failed to fetch car data: ${t.message}", t)
+        }
+    })
 }
+

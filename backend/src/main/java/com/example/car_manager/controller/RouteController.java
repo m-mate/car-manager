@@ -48,6 +48,15 @@ public class RouteController {
         return ResponseEntity.ok(routeDetails);
     }
 
-
+    @PostMapping("/check/{username}/{carId}")
+    public ResponseEntity<String> checkForNewRoute(@PathVariable String username, @PathVariable Integer carId) {
+        User user = userService.findByUsername(username);
+        Car car = carService.findById(carId);
+        routeService.checkForNewRoute(user, car);
+        return ResponseEntity.ok("Route check completed successfully");
+    }
 }
+
+
+
 

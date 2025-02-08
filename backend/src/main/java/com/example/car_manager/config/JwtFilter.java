@@ -32,6 +32,14 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        String requestURI = request.getRequestURI();
+
+        // Allow unauthenticated access to /add/** routes
+        if (requestURI.startsWith("/add/") || requestURI.startsWith("/users/register") || requestURI.startsWith("/users/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;

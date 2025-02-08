@@ -31,7 +31,6 @@ fun LoginScreen(navController: androidx.navigation.NavHostController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,13 +38,7 @@ fun LoginScreen(navController: androidx.navigation.NavHostController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedTextField(
-            value = serveraddress,
-            onValueChange = { serveraddress = it },
-            label = { Text("Server ip") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
@@ -62,7 +55,7 @@ fun LoginScreen(navController: androidx.navigation.NavHostController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { handleLogin(serveraddress,username, password, context, navController) },
+            onClick = { handleLogin(username, password, context, navController) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
@@ -74,15 +67,12 @@ fun LoginScreen(navController: androidx.navigation.NavHostController) {
     }
 }
 
-fun handleLogin(serveraddress: String,username: String, password: String, context: Context, navController: androidx.navigation.NavHostController) {
+fun handleLogin(username: String, password: String, context: Context, navController: androidx.navigation.NavHostController) {
     if (username.isEmpty() || password.isEmpty()) {
         Toast.makeText(context, "Both fields are required", Toast.LENGTH_SHORT).show()
         return
     }
-    if(serveraddress != ""){
-        val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("server_address", serveraddress).apply()
-    }
+
 
     val user = User(username, password)
     val apiService = RetrofitClient.create(context,"").create(CarApiService::class.java)

@@ -5,11 +5,15 @@ package com.example.frontend.ui.routes
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +35,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
 
     // Fetch routes when the screen is launched
     LaunchedEffect(carId) {
-        fetchRoutesForCar(context, carId, routes)
+        fetchRoutesForCar(navController,context, carId, routes)
     }
 
     Column(
@@ -39,14 +43,23 @@ fun RoutesScreen(navController: NavController, carId: Int) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Button(
-            onClick = {
-                Toast.makeText(context, "Live monitoring started!", Toast.LENGTH_SHORT).show()
-                navController.navigate("dashboard")
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Start Live Monitoring")
+            Text(text = "My Routes", style = MaterialTheme.typography.h6)
+
+            Button(
+                onClick = { refreshRoutes(navController, context, carId, routes) }
+            ) {
+                Icon(
+                    Icons.Filled.Refresh,
+                    contentDescription = "Refresh Routes",
+
+                    //modifier = Modifier.padding(end = 8.dp)
+                )
+                //Text(text = "Refresh Routes")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -64,6 +77,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
     }
 }
 
+
 @Composable
 fun RouteItem(route: Route, navController: NavController) {
     Column(
@@ -79,7 +93,7 @@ fun RouteItem(route: Route, navController: NavController) {
 }
 
 // Function to fetch routes from API
-private fun fetchRoutesForCar(context: Context, carId: Int, routeList: MutableList<Route>) {
+private fun fetchRoutesForCar(navController: NavController, context: Context, carId: Int, routeList: MutableList<Route>) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
     val username = sharedPreferences.getString("username", null)
@@ -97,6 +111,13 @@ private fun fetchRoutesForCar(context: Context, carId: Int, routeList: MutableLi
                     routeList.clear()
                     routeList.addAll(it)
                 }
+            } else if (response.code() == 401) {
+                sharedPreferences.edit().remove("jwt_token").apply()
+                sharedPreferences.edit().clear().apply()
+                Toast.makeText(context, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+                navController.navigate("login") {
+                    popUpTo("dashboard") { inclusive = true } // Clear backstack
+                }
             } else {
                 Toast.makeText(context, "No routes found or server error.", Toast.LENGTH_SHORT).show()
             }
@@ -109,3 +130,32 @@ private fun fetchRoutesForCar(context: Context, carId: Int, routeList: MutableLi
         }
     })
 }
+
+
+private fun refreshRoutes(navController: NavController, context: Context, carId: Int, routeList: MutableList<Route>) {
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val token = sharedPreferences.getString("jwt_token", null)
+    val username = sharedPreferences.getString("username", null)
+
+    if (token.isNullOrEmpty() || username.isNullOrEmpty()) {
+        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
+    apiService.refreshRoutes(username, carId).enqueue(object : Callback<Void> {
+        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            if (response.isSuccessful) {
+                fetchRoutesForCar(navController, context, carId, routeList)
+            } else {
+                Toast.makeText(context, "Failed to refresh routes. Server error.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        override fun onFailure(call: Call<Void>, t: Throwable) {
+            Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+            Log.e("Error", "Error occurred: ${t.message}", t)
+        }
+    })
+}
+
