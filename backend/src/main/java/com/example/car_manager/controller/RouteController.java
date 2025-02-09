@@ -10,6 +10,7 @@ import com.example.car_manager.service.CarService;
 import com.example.car_manager.service.RouteService;
 import com.example.car_manager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,13 @@ public class RouteController {
         routeService.checkForNewRoute(user, car);
         return ResponseEntity.ok("Route check completed successfully");
     }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<Void> deleteRoute(@PathVariable Long id) {
+        routeService.deleteRoute(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }
 
 

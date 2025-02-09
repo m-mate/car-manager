@@ -63,4 +63,7 @@ interface CarApiService {
     @POST("routes/check/{username}/{carId}")
     fun refreshRoutes(@Path("username") username: String, @Path("carId") carId: Int): Call<Void>
 
+    @DELETE("routes/delete/{routeId}")
+    fun deleteRoute(@Path("routeId") routeId: Int): Call<Void>
+
 }

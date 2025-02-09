@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
@@ -85,7 +86,11 @@ fun RoutesScreen(navController: NavController, carId: Int) {
             verticalArrangement = Arrangement.spacedBy(8.dp) // Add space between items
         ) {
             items(routes) { route ->
-                RouteItem(route = route, navController)
+                RouteItem(
+                    route = route,
+                    navController = navController,
+                    onDelete = { routeId -> deleteRoute(context, routes, routeId, navController) }
+                )
             }
         }
 
@@ -98,28 +103,91 @@ fun RoutesScreen(navController: NavController, carId: Int) {
 }
 
 @Composable
-fun RouteItem(route: Route, navController: NavController) {
+fun RouteItem(route: Route, navController: NavController, onDelete: (Int) -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Delete Route") },
+            text = { Text("Are you sure you want to delete this route?") },
+            confirmButton = {
+                Button(onClick = {
+                    onDelete(route.id)
+                    showDialog = false
+                }) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable { navController.navigate("routeDetails/${route.id}") },
-        shape = RoundedCornerShape(8.dp), // Rounded corners for the card
-        elevation = 16.dp // Shadow effect for the card
+        shape = RoundedCornerShape(8.dp),
+        elevation = 16.dp
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp) // Padding inside the card
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Route ID: ${route.id}", fontSize = 18.sp, style = MaterialTheme.typography.h6)
-            Spacer(modifier = Modifier.height(4.dp)) // Space between text
-            Text(text = "Start: ${route.startTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
-            Spacer(modifier = Modifier.height(4.dp)) // Space between text
-            Text(text = "End: ${route.finishTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "Route ID: ${route.id}", fontSize = 18.sp, style = MaterialTheme.typography.h6)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "Start: ${route.startTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "End: ${route.finishTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
+            }
+
+            IconButton(onClick = { showDialog = true }) {
+                Icon(Icons.Filled.Delete, contentDescription = "Delete Route", tint = MaterialTheme.colors.error)
+            }
         }
     }
 }
+
+private fun deleteRoute(context: Context, routeList: MutableList<Route>, routeId: Int, navController: NavController) {
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val token = sharedPreferences.getString("jwt_token", null)
+
+    if (token.isNullOrEmpty()) {
+        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
+    apiService.deleteRoute(routeId).enqueue(object : Callback<Void> {
+        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            if (response.isSuccessful) {
+                // Remove the deleted route from the list and update UI
+                routeList.removeAll { it.id == routeId }
+
+                // Trigger recomposition
+                Toast.makeText(context, "Route deleted successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to delete route", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        override fun onFailure(call: Call<Void>, t: Throwable) {
+            Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+        }
+    })
+}
+
 
 
 
@@ -189,4 +257,5 @@ private fun refreshRoutes(navController: NavController, context: Context, carId:
         }
     })
 }
+
 

@@ -7,6 +7,7 @@ import com.example.car_manager.model.Route;
 import com.example.car_manager.model.User;
 import com.example.car_manager.repo.CarDataRepository;
 import com.example.car_manager.repo.RouteRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -136,6 +137,14 @@ public class RouteService {
         );
 
         return new RouteDetailsDTO(route, carDataList);
+    }
+
+    @Transactional
+    public void deleteRoute(Long routeId) {
+        Route route = routeRepository.findById(routeId).get();
+        carDataRepository.deleteByCarAndTimeStampBetween(route.getCar(), route.getStartTime(), route.getFinishTime());
+        routeRepository.deleteById(routeId);
+
     }
 
 }

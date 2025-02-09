@@ -16,4 +16,6 @@ public interface CarDataRepository extends JpaRepository<CarData, Long> {
     List<CarData> findByCarAndInRouteFalseOrderByTimeStampAsc(Car car);
 
     List<CarData> findByCarAndTimeStampBetween(Car car, LocalDateTime localDateTime, LocalDateTime localDateTime1);
+
+    void deleteByCarAndTimeStampBetween(Car car, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }
