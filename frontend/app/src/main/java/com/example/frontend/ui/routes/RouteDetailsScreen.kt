@@ -46,6 +46,7 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(color = Color(0xFFDEE4E7))
     ) {
 
 
@@ -58,18 +59,56 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Route details
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                item { RouteInfoItem("Avg Speed", "${details.route.avgSpeed} km/h") }
-                item { RouteInfoItem("Distance", "${details.route.distanceTraveled} km") }
-                item { RouteInfoItem("Fuel Consumption", "${details.route.avgFuelConsumption} L/100km") }
-                item { RouteInfoItem("Fuel Used", "${details.route.fuelUsed} L") }
-                item { RouteInfoItem("Start Time", details.route.startTime) }
-                item { RouteInfoItem("Finish Time", details.route.finishTime) }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                elevation = 4.dp,
+                backgroundColor = Color.White
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Route Summary",
+                        fontSize = 20.sp,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        RouteInfoRow("Avg Speed", "${details.route.avgSpeed} km/h", "Distance", "${details.route.distanceTraveled} km")
+                        RouteInfoRow("Fuel Consumption", "${details.route.avgFuelConsumption} L/100km", "Fuel Used", "${details.route.fuelUsed} L")
+                        //RouteInfoRow("Start Time", details.route.startTime, "Finish Time", details.route.finishTime)
+                    }
+                }
             }
         } ?: run {
             Text("Loading route details...", fontSize = 18.sp)
         }
+    }
+}
+
+@Composable
+fun RouteInfoRow(label1: String, value1: String, label2: String, value2: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        RouteInfoItem(label1, value1)
+        RouteInfoItem(label2, value2)
+    }
+}
+
+// Updated RouteInfoItem to align text properly
+@Composable
+fun RouteInfoItem(label: String, value: String) {
+    Column {
+        Text(label, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+        Text(value)
     }
 }
 
@@ -104,14 +143,7 @@ private fun fetchRouteDetails(context: Context, routeId: Int, routeDetails: Muta
 }
 
 // Component to display route details
-@Composable
-fun RouteInfoItem(label: String, value: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Text("$label:", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(value)
-    }
-}
+
 
 
 
@@ -134,70 +166,79 @@ fun RouteChart(carData: List<CarData>) {
         else -> speedValues // Default to Speed if no match
     }
 
-    // Add a toggle (RadioButtons or Buttons) to select the data type
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .background(color = Color(0xFFDEE4E7))
-
-    ) {
-        // Add buttons to select which data type to display
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            DataToggleButton("Speed", selectedDataType) {
-                selectedDataType = it
-            }
-            DataToggleButton("RPM", selectedDataType) {
-                selectedDataType = it
-            }
-            DataToggleButton("Fuel Rate", selectedDataType) {
-                selectedDataType = it
-            }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // The LineChart displaying only the selected data
-        LineChart(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp) // Make it smaller by specifying height
-                .padding(horizontal = 22.dp),
-            data = remember(selectedValues) {
-                listOf(
-                    Line(
-                        label = selectedDataType,
-                        values = selectedValues,
-                        color = SolidColor(
-                            when (selectedDataType) {
-                                "Speed" -> Color(0xFF23af92)
-                                "RPM" -> Color(0xFFff8c00)
-                                "Fuel Rate" -> Color(0xFFf44336)
-                                else -> Color(0xFF23af92)
-                            }
-                        ),
-                        firstGradientFillColor = when (selectedDataType) {
-                            "Speed" -> Color(0xFF2BC0A1).copy(alpha = .5f)
-                            "RPM" -> Color(0xFFFF9E3A).copy(alpha = .5f)
-                            "Fuel Rate" -> Color(0xFFf44336).copy(alpha = .5f)
-                            else -> Color(0xFF2BC0A1).copy(alpha = .5f)
-                        },
-                        secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
-                        gradientAnimationDelay = 1000,
-                        drawStyle = DrawStyle.Stroke(width = 2.dp),
-                    )
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            elevation = 4.dp,
+            backgroundColor = Color.White
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .background(color = Color(0xFFffffff))
+
+            ) {
+                // Add buttons to select which data type to display
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    DataToggleButton("Speed", selectedDataType) {
+                        selectedDataType = it
+                    }
+                    DataToggleButton("RPM", selectedDataType) {
+                        selectedDataType = it
+                    }
+                    DataToggleButton("Fuel Rate", selectedDataType) {
+                        selectedDataType = it
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // The LineChart displaying only the selected data
+                LineChart(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp) // Make it smaller by specifying height
+                        .padding(horizontal = 22.dp),
+                    data = remember(selectedValues) {
+                        listOf(
+                            Line(
+                                label = selectedDataType,
+                                values = selectedValues,
+                                color = SolidColor(
+                                    when (selectedDataType) {
+                                        "Speed" -> Color(0xFF23af92)
+                                        "RPM" -> Color(0xFFff8c00)
+                                        "Fuel Rate" -> Color(0xFFf44336)
+                                        else -> Color(0xFF23af92)
+                                    }
+                                ),
+                                firstGradientFillColor = when (selectedDataType) {
+                                    "Speed" -> Color(0xFF2BC0A1).copy(alpha = .5f)
+                                    "RPM" -> Color(0xFFFF9E3A).copy(alpha = .5f)
+                                    "Fuel Rate" -> Color(0xFFf44336).copy(alpha = .5f)
+                                    else -> Color(0xFF2BC0A1).copy(alpha = .5f)
+                                },
+                                secondGradientFillColor = Color.Transparent,
+                                strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                                gradientAnimationDelay = 1000,
+                                drawStyle = DrawStyle.Stroke(width = 2.dp),
+                            )
+                        )
+                    },
+                    animationMode = AnimationMode.Together(delayBuilder = {
+                        it * 500L
+                    }),
                 )
-            },
-            animationMode = AnimationMode.Together(delayBuilder = {
-                it * 500L
-            }),
-        )
-    }
-}
+            }
+        }
+        }
+
+
 
 // Composable to handle each toggle button for data selection
 @Composable
@@ -212,5 +253,4 @@ fun DataToggleButton(label: String, selectedDataType: String, onClick: (String) 
         Text(text = label)
     }
 }
-
 
