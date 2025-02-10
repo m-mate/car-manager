@@ -1,5 +1,6 @@
 package com.example.frontend.ui.routes
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -30,7 +31,12 @@ import ir.ehsannarmani.compose_charts.models.Line
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.math.round
+import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun RouteDetailsScreen(navController: NavController, routeId: Int) {
@@ -82,7 +88,7 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         RouteInfoRow("Avg Speed", "${details.route.avgSpeed} km/h", "Distance", "${details.route.distanceTraveled} km")
                         RouteInfoRow("Fuel Consumption", "${details.route.avgFuelConsumption} L/100km", "Fuel Used", "${details.route.fuelUsed} L")
-                        //RouteInfoRow("Start Time", details.route.startTime, "Finish Time", details.route.finishTime)
+                        RouteInfoRow( "Duration", calculateDuration(details.route.startTime, details.route.finishTime), "Data Count",details.carData.size.toString() )
                     }
                 }
             }
@@ -254,3 +260,23 @@ fun DataToggleButton(label: String, selectedDataType: String, onClick: (String) 
     }
 }
 
+
+fun calculateDuration(startTime: String, finishTime: String): String {
+    return try {
+        val cleanedStartTime = startTime.substringBefore('.')
+        val cleanedFinishTime = finishTime.substringBefore('.')
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+
+        val start = format.parse(cleanedStartTime)!!
+        val finish = format.parse(cleanedFinishTime)!!
+
+        val durationMillis = finish.time - start.time
+        val hours = TimeUnit.MILLISECONDS.toHours(durationMillis)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis) % 60
+
+        "$hours h $minutes min"
+    } catch (e: Exception) {
+        println(e.message)
+        "Invalid time"
+    }
+}
