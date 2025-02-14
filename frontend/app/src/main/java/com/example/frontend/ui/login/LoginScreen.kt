@@ -89,7 +89,7 @@ fun handleLogin(username: String, password: String, context: Context, navControl
                     Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show()
                     Log.d("LoginScreen", "JWT Token: $token")
 
-                    navController.navigate("carList")
+                    navController.navigate("carList"){popUpTo(0) { inclusive = true }}
                 } else {
                     Toast.makeText(context, "Empty token received", Toast.LENGTH_SHORT).show()
                 }

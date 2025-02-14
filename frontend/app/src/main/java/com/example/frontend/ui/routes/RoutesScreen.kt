@@ -49,14 +49,14 @@ fun RoutesScreen(navController: NavController, carId: Int) {
         // Title Row with Background, Shadow, and Refresh Button
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colors.primary, // Background color for the row
-            elevation = 8.dp, // Shadow effect to elevate the row
-            shape = RoundedCornerShape(8.dp) // Rounded corners for the row background
+            color = MaterialTheme.colors.primary,
+            elevation = 8.dp,
+            shape = RoundedCornerShape(8.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp), // Padding inside the row
+                    .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(

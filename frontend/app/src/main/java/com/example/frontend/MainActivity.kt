@@ -92,11 +92,7 @@ fun MainNavigation() {
     var showBackButton by remember { mutableStateOf(false) }
     var showMenuButton by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
-    val CustomPrimaryColor = Color(0xff949494)
-    val CustomSecondaryColor = Color(0xFF03DAC6)
-    val CustomBackgroundColor = Color(0xFFF5F5F5)
-    val CustomOnPrimaryColor = Color(0xFFFFFFFF)
-    val CustomOnBackgroundColor = Color(0xFF000000)
+
 
 
     // Wrap everything in MaterialTheme

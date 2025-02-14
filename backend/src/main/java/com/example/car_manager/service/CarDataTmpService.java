@@ -1,5 +1,6 @@
 package com.example.car_manager.service;
 
+import com.example.car_manager.model.Car;
 import com.example.car_manager.model.CarData;
 import com.example.car_manager.model.CarDataTmp;
 import com.example.car_manager.repo.CarDataRepository;
@@ -35,6 +36,40 @@ public class CarDataTmpService {
     public CarDataTmp getCarDataTmpById(Long id) {
         return carDataTmpRepository.findById(id).get();
     }
+
+
+    @Transactional
+    public void checkForRemainingData(Car car){
+
+
+
+            List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(car.getVin());
+            //log.info("carDataTmpList: {}", carDataTmpList);
+            log.info("carDataTmpSize: {}", carDataTmpList.size());
+
+            double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
+            log.info("avgSpeed: {}", avgSpeed);
+            int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
+            log.info("avgRpm: {}", avgRpm);
+
+            double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
+            log.info("avgFuelRate: {}", avgFuelRate);
+
+            CarData carData = new CarData();
+            carData.setSpeed(avgSpeed);
+            carData.setRpm(avgRpm);
+            carData.setFuelRate(avgFuelRate);
+            carData.setTimeStamp(carDataTmpList.getLast().getTimeStamp());
+            carData.setCar(car);
+
+
+            carDataTmpRepository.deleteAllByCar_Vin(car.getVin());
+
+            carDataRepository.save(carData);
+
+
+    }
+
 
     @Transactional
     public CarDataTmp saveCarDataTmp(CarDataTmp carDataTmp) {

@@ -69,7 +69,7 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                elevation = 4.dp,
+                elevation = 8.dp,
                 backgroundColor = Color.White
             ) {
                 Column(
@@ -176,7 +176,7 @@ fun RouteChart(carData: List<CarData>) {
 
         Card(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
-            elevation = 4.dp,
+            elevation = 8.dp,
             backgroundColor = Color.White
         ) {
             Column(
@@ -204,11 +204,11 @@ fun RouteChart(carData: List<CarData>) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // The LineChart displaying only the selected data
+
                 LineChart(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp) // Make it smaller by specifying height
+                        .height(200.dp)
                         .padding(horizontal = 22.dp),
                     data = remember(selectedValues) {
                         listOf(

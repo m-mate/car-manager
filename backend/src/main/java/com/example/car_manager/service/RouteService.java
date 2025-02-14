@@ -20,6 +20,7 @@ import java.util.List;
 public class RouteService {
     RouteRepository routeRepository;
     CarDataRepository carDataRepository;
+    private CarDataTmpService carDataTmpService;
 
     @Autowired
     public void setCarDataRepository(CarDataRepository carDataRepository) {
@@ -38,6 +39,7 @@ public class RouteService {
 
 
     public void checkForNewRoute(User user, Car car) {
+        carDataTmpService.checkForRemainingData(car);
         List<CarData> carDataList = carDataRepository.findByCarAndInRouteFalseOrderByTimeStampAsc(car);
         List<Route> newRoutes = new ArrayList<>();
 
@@ -147,4 +149,8 @@ public class RouteService {
 
     }
 
+    @Autowired
+    public void setCarDataTmpService(CarDataTmpService carDataTmpService) {
+        this.carDataTmpService = carDataTmpService;
+    }
 }
