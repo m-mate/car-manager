@@ -20,7 +20,13 @@ object RetrofitClient {
     // Function to create a Retrofit instance with a token
     fun create(context: Context, token: String): Retrofit {
         val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        val baseUrl = sharedPreferences.getString("server_address", "") // Default fallback
+        val baseUrl = sharedPreferences.getString("server_address", "http://192.168.100.50:8080") // Default fallback
+
+        if (baseUrl != null) {
+            if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+                throw IllegalArgumentException("Invalid base URL: $baseUrl. Ensure it starts with 'http://' or 'https://'.")
+            }
+        }
 
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
