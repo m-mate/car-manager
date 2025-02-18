@@ -238,6 +238,7 @@ fun UserScreen(navController: NavHostController) {
 suspend fun fetchAllUsers(context: Context): MutableList<User> {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
+    val username = sharedPreferences.getString("username", null)
 
     if (token.isNullOrEmpty()) {
         withContext(Dispatchers.Main) {
@@ -254,7 +255,7 @@ suspend fun fetchAllUsers(context: Context): MutableList<User> {
         }
 
         if (response.isSuccessful) {
-            response.body()?.toMutableList() ?: mutableListOf()
+            response.body()?.filterNot { it.username == username }?.toMutableList() ?: mutableListOf()
         } else {
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "Failed to fetch users. Error: ${response.code()}", Toast.LENGTH_SHORT).show()
