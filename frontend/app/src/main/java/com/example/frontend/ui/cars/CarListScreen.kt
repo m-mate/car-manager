@@ -29,7 +29,7 @@ fun CarListScreen(navController: NavController) {
     val carList = remember { mutableStateListOf<Car>() }
     val coroutineScope = rememberCoroutineScope()
 
-    // Fetch cars when the screen is launched
+
     LaunchedEffect(Unit) {
         fetchCarsForUser(navController,context, carList)
     }
@@ -41,7 +41,7 @@ fun CarListScreen(navController: NavController) {
     ) {
         Button(
             onClick = {
-                navController.navigate("addCar") // Navigate to Add Car Screen
+                navController.navigate("addCar")
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -50,7 +50,7 @@ fun CarListScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display car list using LazyColumn
+
         if (carList.isNotEmpty()) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(carList) { car ->
@@ -76,7 +76,7 @@ fun CarListScreen(navController: NavController) {
 
 @Composable
 fun CarItem(car: Car, onClick: () -> Unit, onDelete: () -> Unit) {
-    var showDialog by remember { mutableStateOf(false) } // State for showing dialog
+    var showDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -99,7 +99,6 @@ fun CarItem(car: Car, onClick: () -> Unit, onDelete: () -> Unit) {
             }
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Trash can button triggers confirmation dialog
             IconButton(onClick = { showDialog = true }) {
                 Icon(
                     imageVector = Icons.Default.Delete,
@@ -110,17 +109,16 @@ fun CarItem(car: Car, onClick: () -> Unit, onDelete: () -> Unit) {
         }
     }
 
-    // Show confirmation dialog before deletion
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false }, // Close dialog when dismissed
+            onDismissRequest = { showDialog = false },
             title = { Text("Delete Car?") },
             text = { Text("Are you sure you want to delete this car? This action cannot be undone.") },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showDialog = false
-                        onDelete() // Call delete function if confirmed
+                        onDelete()
                     }
                 ) {
                     Text("Delete", color = MaterialTheme.colors.error)
@@ -136,7 +134,6 @@ fun CarItem(car: Car, onClick: () -> Unit, onDelete: () -> Unit) {
 }
 
 
-// Function to fetch cars from API
 private fun fetchCarsForUser(navController: NavController, context: Context, carList: MutableList<Car>) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
@@ -173,7 +170,6 @@ private fun fetchCarsForUser(navController: NavController, context: Context, car
     })
 }
 
-// Function to delete a car
 private fun deleteCar(navController: NavController, context: Context, carId: Int, carList: MutableList<Car>) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)

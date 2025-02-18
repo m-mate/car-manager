@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -69,7 +68,7 @@ private fun getSavedServerIp(sharedPreferences: SharedPreferences): String {
 }
 
 
-// Function to save server IP to SharedPreferences
+
 private fun saveServerIp(
     serverAddress: String,
     context: Context,

@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Colors
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -25,10 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -49,7 +46,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate executed")
-        //clearToken()
+
 
         setContent {
    
@@ -58,28 +55,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun clearToken() {
-        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        sharedPreferences.edit().remove("jwt_token").apply()
-        sharedPreferences.edit().remove("server_address").apply()
 
-    }
 }
 
 val customColors = Colors(
-    primary = Color(0xFF001F3F), // your primary color
-    primaryVariant = Color(0xFF3700B3), // your primary variant
-    secondary = Color(0xff88898a), // your secondary color
-    secondaryVariant = Color(0xFF018786), // secondary variant
-    background = Color(0xffe3e3e3), // background color
-    surface = Color(0xFFFFFFFF), // surface color
-    error = Color(0xFFB00020), // error color
-    onPrimary = Color.White, // onPrimary color (for text/icons)
-    onSecondary = Color.Black, // onSecondary color
-    onBackground = Color.Black, // onBackground color
-    onSurface = Color.Black, // onSurface color
+    primary = Color(0xFF001F3F),
+    primaryVariant = Color(0xFF3700B3),
+    secondary = Color(0xff88898a),
+    secondaryVariant = Color(0xFF018786),
+    background = Color(0xffe3e3e3),
+    surface = Color(0xFFFFFFFF),
+    error = Color(0xFFB00020),
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black,
     onError = Color.White,
-    isLight = true // onError color
+    isLight = true
 )
 
 
@@ -95,9 +87,9 @@ fun MainNavigation() {
 
 
 
-    // Wrap everything in MaterialTheme
+
     MaterialTheme(
-        colors = customColors // Apply the custom colors globally
+        colors = customColors
     ) {
 
         Scaffold(

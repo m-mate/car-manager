@@ -23,7 +23,6 @@ import retrofit2.Response
 
 @Composable
 fun LoginScreen(navController: androidx.navigation.NavHostController) {
-    var serveraddress by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current

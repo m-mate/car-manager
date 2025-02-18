@@ -5,7 +5,6 @@ package com.example.frontend.ui.routes
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +33,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
     val context = LocalContext.current
     val routes = remember { mutableStateListOf<Route>() }
 
-    // Fetch routes when the screen is launched
+
     LaunchedEffect(carId) {
         fetchRoutesForCar(navController, context, carId, routes)
     }
@@ -46,7 +44,6 @@ fun RoutesScreen(navController: NavController, carId: Int) {
             .padding(16.dp)
     ) {
 
-        // Title Row with Background, Shadow, and Refresh Button
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colors.primary,
@@ -62,7 +59,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
                 Text(
                     text = "My Routes",
                     style = MaterialTheme.typography.h6,
-                    color = MaterialTheme.colors.onPrimary // Ensures the text is visible on the primary background
+                    color = MaterialTheme.colors.onPrimary
                 )
 
                 Button(
@@ -72,18 +69,18 @@ fun RoutesScreen(navController: NavController, carId: Int) {
                     Icon(
                         Icons.Filled.Refresh,
                         contentDescription = "Refresh Routes",
-                        tint = MaterialTheme.colors.onSecondary // Ensure icon is visible on button
+                        tint = MaterialTheme.colors.onSecondary
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp)) // Spacer between header and LazyColumn
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Display routes in a LazyColumn
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp) // Add space between items
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(routes) { route ->
                 RouteItem(
@@ -94,7 +91,7 @@ fun RoutesScreen(navController: NavController, carId: Int) {
             }
         }
 
-        // If there are no routes
+
         if (routes.isEmpty()) {
             Spacer(modifier = Modifier.weight(1f)) // Make sure the "No routes" text is aligned
             Text("No routes available", fontSize = 18.sp, style = MaterialTheme.typography.body1)
@@ -172,11 +169,9 @@ private fun deleteRoute(context: Context, routeList: MutableList<Route>, routeId
     apiService.deleteRoute(routeId).enqueue(object : Callback<Void> {
         override fun onResponse(call: Call<Void>, response: Response<Void>) {
             if (response.isSuccessful) {
-                // Remove the deleted route from the list and update UI
+
                 routeList.removeAll { it.id == routeId }
 
-                // Trigger recomposition
-                Toast.makeText(context, "Route deleted successfully", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "Failed to delete route", Toast.LENGTH_SHORT).show()
             }

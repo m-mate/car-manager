@@ -1,10 +1,8 @@
 package com.example.frontend.ui.dashboard
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -21,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.frontend.CarApiService
@@ -41,7 +38,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.DecimalFormat
-import java.time.LocalDateTime
 
 
 @Composable
@@ -97,11 +93,11 @@ fun DashboardScreen(navController: NavHostController) {
 
                 Text(
                     text = "Fuel Rate: ${carData?.fuelRate ?: 0}l/100km",
-                    color = Color.White // 👈 Text color set to white
+                    color = Color.White
                 )
                 Text(
                     text = "Coolant Temp: ${carData?.coolantTemp ?: 0}°C",
-                    color = Color.White // 👈 Text color set to white
+                    color = Color.White
                 )
                 val animatedRPM by animateFloatAsState(
                     targetValue = carData?.rpm?.div(1000f) ?: 0f,
@@ -112,7 +108,7 @@ fun DashboardScreen(navController: NavHostController) {
 
             }
         } else {
-            // Landscape layout (horizontal)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,7 +148,6 @@ fun DashboardScreen(navController: NavHostController) {
 
 @Composable
 fun SpeedometerView(speed: Float) {
-     // Increased size
         Gauge(
             modifier = Modifier.size(250.dp),
             value = speed,

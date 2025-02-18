@@ -36,7 +36,7 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int) {
     val context = LocalContext.current
     val routeDetails = remember { mutableStateOf<RouteDetails?>(null) }
 
-    // Fetch route details when the screen is launched
+
     LaunchedEffect(routeId) {
         fetchRouteDetails(context, routeId, routeDetails)
     }
@@ -51,9 +51,9 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Show route details if available
+
         routeDetails.value?.let { details ->
-            // Line graph
+
             RouteChart(carData = details.carData)
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -102,7 +102,6 @@ fun RouteInfoRow(label1: String, value1: String, label2: String, value2: String)
     }
 }
 
-// Updated RouteInfoItem to align text properly
 @Composable
 fun RouteInfoItem(label: String, value: String) {
     Column {
@@ -111,7 +110,6 @@ fun RouteInfoItem(label: String, value: String) {
     }
 }
 
-// Function to fetch route details from API
 private fun fetchRouteDetails(context: Context, routeId: Int, routeDetails: MutableState<RouteDetails?>) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
@@ -141,7 +139,7 @@ private fun fetchRouteDetails(context: Context, routeId: Int, routeDetails: Muta
     })
 }
 
-// Component to display route details
+
 
 
 
@@ -149,20 +147,16 @@ private fun fetchRouteDetails(context: Context, routeId: Int, routeDetails: Muta
 
 @Composable
 fun RouteChart(carData: List<CarData>) {
-    // State to keep track of the selected data type
     var selectedDataType by remember { mutableStateOf("Speed") }
-
-    // Create the lists of values for each type of data
     val speedValues = carData.map { it.speed.toDouble() }
     val rpmValues = carData.map { it.rpm.toDouble() }
     val fuelRateValues = carData.map { it.fuelRate.toDouble() }
 
-    // Function to get the data based on the selected type
     val selectedValues = when (selectedDataType) {
         "Speed" -> speedValues
         "RPM" -> rpmValues
         "Fuel Rate" -> fuelRateValues
-        else -> speedValues // Default to Speed if no match
+        else -> speedValues
     }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -179,7 +173,6 @@ fun RouteChart(carData: List<CarData>) {
                     .background(color = Color(0xFFffffff))
 
             ) {
-                // Add buttons to select which data type to display
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -239,7 +232,6 @@ fun RouteChart(carData: List<CarData>) {
 
 
 
-// Composable to handle each toggle button for data selection
 @Composable
 fun DataToggleButton(label: String, selectedDataType: String, onClick: (String) -> Unit) {
     Button(

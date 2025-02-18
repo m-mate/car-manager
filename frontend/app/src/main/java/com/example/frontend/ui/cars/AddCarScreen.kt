@@ -19,24 +19,20 @@ import retrofit2.Response
 
 @Composable
 fun AddCarScreen(navController: NavController) {
-    // State for car model input
     var carModel by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    // Handling Save car
     val saveCar: (String) -> Unit = { model ->
         if (model.isEmpty()) {
             Toast.makeText(context, "Car model cannot be empty", Toast.LENGTH_SHORT).show()
 
         }
-        // Create car object
         val car = Car(type = model, vin = "")
         saveCar(car,context, navController);
 
     }
 
-    // UI elements
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,7 +40,6 @@ fun AddCarScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Car Model TextField
         TextField(
             value = carModel,
             onValueChange = { carModel = it },

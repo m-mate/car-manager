@@ -38,11 +38,10 @@ fun BottomNavigationBar(navController: NavController, context: Context) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val carId = sharedPreferences.getInt("carId", 0)
 
-    // Creating a Button for "Dashboard" with rounded top corners
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                // Optional padding around the button
                 .clip(RoundedCornerShape(topStart = 150.dp, topEnd = 150.dp)) // Rounded top corners
                 .background(MaterialTheme.colors.primary) // Background color of the button
 
@@ -50,13 +49,12 @@ fun BottomNavigationBar(navController: NavController, context: Context) {
         ) {
             Button(
                 onClick = {
-                    // Navigate to the Dashboard route
                     navController.navigate("dashboard")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                , // Adjust height as needed
+                ,
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
             ) {
                 Row(
