@@ -10,12 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.frontend.Car
+import com.example.frontend.model.Car
 import com.example.frontend.CarApiService
 import com.example.frontend.RetrofitClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -68,7 +65,7 @@ fun AddCarScreen(navController: NavController) {
     }
 }
 
-fun saveCar(car: Car, context: Context,  navController: NavController) {
+fun saveCar(car: Car, context: Context, navController: NavController) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
     val username = sharedPreferences.getString("username", null)

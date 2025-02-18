@@ -16,10 +16,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.frontend.Car
+import com.example.frontend.model.Car
 import com.example.frontend.CarApiService
 import com.example.frontend.RetrofitClient
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

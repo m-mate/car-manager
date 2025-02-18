@@ -17,12 +17,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.frontend.Car
 import com.example.frontend.RetrofitClient
-import com.example.frontend.User
+import com.example.frontend.model.User
 import com.example.frontend.CarApiService
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
@@ -272,7 +270,7 @@ suspend fun fetchAllUsers(context: Context): MutableList<User> {
 }
 
 
-private fun deleteUser(context: Context,userList:MutableList<User> ,userId: Int, currentUserId: Int, navController: NavHostController) {
+private fun deleteUser(context: Context, userList:MutableList<User>, userId: Int, currentUserId: Int, navController: NavHostController) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
 
