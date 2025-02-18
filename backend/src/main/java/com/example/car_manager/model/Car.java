@@ -22,13 +22,7 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    public String getType() {
-        return type;
-    }
 
-    public void setType(String type) {
-        this.type = type;
-    }
 
     @Column(nullable = false, unique = true)
     private String vin;
@@ -46,14 +40,6 @@ public class Car {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
-
-    public String getVin() {
-        return vin;
-    }
-
-    public void setVin(String vin) {
-        this.vin = vin;
-    }
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     @JsonManagedReference

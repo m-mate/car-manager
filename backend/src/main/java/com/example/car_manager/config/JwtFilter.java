@@ -34,7 +34,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        // Allow unauthenticated access to /add/** routes
+
         if (requestURI.startsWith("/add/") || requestURI.startsWith("/users/register") || requestURI.startsWith("/users/login")) {
             filterChain.doFilter(request, response);
             return;

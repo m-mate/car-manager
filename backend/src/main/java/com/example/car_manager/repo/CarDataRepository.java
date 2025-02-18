@@ -11,7 +11,6 @@ import java.util.List;
 public interface CarDataRepository extends JpaRepository<CarData, Long> {
 
 
-    List<CarData> findByCar(Car car);
 
     List<CarData> findByCarAndInRouteFalseOrderByTimeStampAsc(Car car);
 

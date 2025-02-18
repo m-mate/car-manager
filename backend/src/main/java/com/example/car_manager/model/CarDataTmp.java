@@ -27,13 +27,6 @@ public class CarDataTmp {
 
     private Integer coolantTemp;
 
-    public Integer getCoolantTemp() {
-        return coolantTemp;
-    }
-
-    public void setCoolantTemp(Integer coolantTemp) {
-        this.coolantTemp = coolantTemp;
-    }
 
     @Column(name = "fuel_rate")
     private Double fuelRate;
@@ -51,47 +44,6 @@ public class CarDataTmp {
         this.timeStamp = LocalDateTime.now();
     }
 
-    public Double getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(Double speed) {
-        this.speed = speed;
-    }
-
-    public Integer getRpm() {
-        return rpm;
-    }
-
-    public void setRpm(Integer rpm) {
-        this.rpm = rpm;
-    }
-
-
-
-    public Double getFuelRate() {
-        return fuelRate;
-    }
-
-    public void setFuelRate(Double fuelRate) {
-        this.fuelRate = fuelRate;
-    }
-
-    public LocalDateTime getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(LocalDateTime timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
-    public void setCar(Car car) {
-        this.car = car;
-    }
-
-    public Car getCar() {
-        return car;
-    }
 
     @Override
     public String toString() {

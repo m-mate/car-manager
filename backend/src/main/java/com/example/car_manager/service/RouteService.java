@@ -33,7 +33,6 @@ public class RouteService {
     }
 
     public List<Route> getAllRoutes(User user, Car car) {
-        //checkForNewRoute(user, car);
         return routeRepository.findByUserAndCar(user, car);
     }
 
@@ -58,7 +57,6 @@ public class RouteService {
             LocalDateTime currentTimestamp = carData.getTimeStamp();
 
             if (previousTimestamp == null || Duration.between(previousTimestamp, currentTimestamp).toMinutes() > 30) {
-                // Save previous route if it exists
                 if (currentRoute != null) {
                     currentRoute.setFinishTime(previousTimestamp);
 
@@ -76,7 +74,6 @@ public class RouteService {
                     newRoutes.add(currentRoute);
                 }
 
-                // Start a new route
                 currentRoute = new Route();
                 currentRoute.setStartTime(currentTimestamp);
                 currentRoute.setCar(car);
@@ -88,7 +85,6 @@ public class RouteService {
                 fuelRateSum = 0;
             }
 
-            // Accumulate data for the current route
             count++;
             speedSum += carData.getSpeed();
             fuelRateSum += carData.getFuelRate();
@@ -97,7 +93,6 @@ public class RouteService {
             previousTimestamp = currentTimestamp;
         }
 
-        // Save the last route
         if (currentRoute != null) {
             currentRoute.setFinishTime(previousTimestamp);
 

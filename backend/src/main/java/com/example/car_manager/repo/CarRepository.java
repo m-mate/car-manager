@@ -9,9 +9,8 @@ import java.util.List;
 public interface CarRepository extends JpaRepository<Car, Integer> {
     Car findByVin(String vin);
 
-    boolean existsByVin(String vin);
 
-    boolean existsByType(String type);
+
 
 
     List<Car> findByUserUsername(String username);

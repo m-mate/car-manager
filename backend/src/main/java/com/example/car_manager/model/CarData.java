@@ -24,13 +24,10 @@ public class CarData {
     private Long id;
 
     @Column
-    @Getter
-    @Setter
     private Double speed;
 
     @Column
     private Integer rpm;
-
 
 
     @Column(name = "fuel_rate")
@@ -59,63 +56,6 @@ public class CarData {
                 ", car=" + car +
                 '}';
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Double getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(Double speed) {
-        this.speed = speed;
-    }
-
-    public Integer getRpm() {
-        return rpm;
-    }
-
-    public void setRpm(Integer rpm) {
-        this.rpm = rpm;
-    }
-
-
-
-    public Double getFuelRate() {
-        return fuelRate;
-    }
-
-    public void setFuelRate(Double fuelRate) {
-        this.fuelRate = fuelRate;
-    }
-
-    public LocalDateTime getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(LocalDateTime timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
-    public Car getCar() {
-        return car;
-    }
-
-    public void setCar(Car car) {
-        this.car = car;
-    }
-
-    public Boolean getInRoute() {
-        return inRoute;
-    }
-
-    public void setInRoute(Boolean inRoute) {
-        this.inRoute = inRoute;
-    }
 }
+
 

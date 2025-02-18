@@ -44,16 +44,12 @@ public class CarDataTmpService {
 
 
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(car.getVin());
-            //log.info("carDataTmpList: {}", carDataTmpList);
-            log.info("carDataTmpSize: {}", carDataTmpList.size());
 
             double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
-            log.info("avgSpeed: {}", avgSpeed);
+
             int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
-            log.info("avgRpm: {}", avgRpm);
 
             double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
-            log.info("avgFuelRate: {}", avgFuelRate);
 
             CarData carData = new CarData();
             carData.setSpeed(avgSpeed);
@@ -80,16 +76,12 @@ public class CarDataTmpService {
 
             carDataTmpRepository.save(carDataTmp);
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(carDataTmp.getCar().getVin());
-            //log.info("carDataTmpList: {}", carDataTmpList);
-            log.info("carDataTmpSize: {}", carDataTmpList.size() );
+
             if (carDataTmpList.size() >= 60) {
                 double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
-                log.info("avgSpeed: {}", avgSpeed);
                 int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
-                log.info("avgRpm: {}", avgRpm);
 
                 double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
-                log.info("avgFuelRate: {}", avgFuelRate);
 
                 CarData carData = new CarData();
                 carData.setSpeed(avgSpeed);
@@ -109,13 +101,10 @@ public class CarDataTmpService {
             return carDataTmp;
 
         } catch (DataAccessException e) {
-            log.error("Database error while saving car data: {}", e.getMessage(), e);
             throw new RuntimeException("Database error occurred", e);
         } catch (NullPointerException e) {
-            log.error("Null pointer error while processing car data: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Received null data, please check the inputs.", e);
         } catch (Exception e) {
-            //logger.error("Unexpected error while processing car data: {}", e.getMessage(), e);
             throw new RuntimeException("Unexpected error occurred", e);
         }
     }
