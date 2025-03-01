@@ -7,6 +7,8 @@ import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -46,6 +48,7 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int) {
             .fillMaxSize()
             .padding(16.dp)
             .background(color = Color(0xFFDEE4E7))
+            .verticalScroll(rememberScrollState())
     ) {
 
 

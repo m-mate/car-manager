@@ -166,6 +166,7 @@ private fun fetchCarsForUser(navController: NavController, context: Context, car
 
         override fun onFailure(call: Call<List<Car>>, t: Throwable) {
             Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+            navController.popBackStack(route = "server", inclusive = false)
         }
     })
 }
@@ -199,6 +200,7 @@ private fun deleteCar(navController: NavController, context: Context, carId: Int
 
         override fun onFailure(call: Call<Void>, t: Throwable) {
             Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+
         }
     })
 }

@@ -185,7 +185,7 @@ fun MainNavigation() {
                 }
                 composable("register") { RegisterScreen(navController) }
                 composable("carList") {
-                    showBottomNav = false; showMenuButton = false; CarListScreen(navController)
+                    showBottomNav = false; showMenuButton = true; CarListScreen(navController)
                 }
                 composable("addCar") { showBackButton = true; AddCarScreen(navController) }
                 composable("user") { showBackButton = true; UserScreen(navController) }

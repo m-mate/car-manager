@@ -49,6 +49,15 @@ fun DashboardScreen(navController: NavHostController) {
     val token = remember { sharedPreferences.getString("jwt_token", null) }
     val vin = remember { sharedPreferences.getString("vin", null) }
     val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+    val activity = context as? android.app.Activity
+
+
+    DisposableEffect(Unit) {
+        activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        onDispose {
+            activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
 
     if (token.isNullOrEmpty() || vin.isNullOrEmpty()) {
         Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
