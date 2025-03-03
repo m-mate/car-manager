@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.frontend.RetrofitClient
 import com.example.frontend.model.User
@@ -25,12 +26,12 @@ import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+/*
 @Composable
-fun UserScreen(navController: NavHostController) {
+fun UserScreen(navController: NavHostController, viewModel: UserViewModel = hiltViewModel()) {
     val context = LocalContext.current
-    var user by remember { mutableStateOf<User?>(null) }
-    var allUsers = remember { mutableStateListOf<User>() }
+    val user = viewModel.user
+    val allUsers = viewModel.allUsers
     var isAdmin by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     // User details
@@ -407,5 +408,133 @@ private fun updateUser(context: Context,  password: String, email: String) {
     } catch (e: Exception) {
         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
 
+    }
+}
+*/
+@Composable
+fun UserScreen(navController: NavHostController, viewModel: UserViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    val user by viewModel.user.collectAsState()
+    val allUsers by viewModel.allUsers.collectAsState()
+    var showDialog by remember { mutableStateOf(false) }
+    var username by remember { mutableStateOf(user?.username ?: "") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(user?.email ?: "") }
+
+
+    LaunchedEffect(Unit) {
+        val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val username = sharedPreferences.getString("username", "") ?: ""
+        viewModel.fetchUser()
+
+
+    }
+
+    LaunchedEffect(user) {
+        username = user?.username ?: ""
+        email = user?.email ?: ""  // ✅ Ensure `email` updates when `user` changes
+        user?.let{
+            if (it.role == "ROLE_ADMIN"){
+                viewModel.fetchAllUsers()
+            } }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "My Details", style = MaterialTheme.typography.h6)
+
+        user?.let {
+            OutlinedTextField(value = it.username, onValueChange = {}, label = { Text("Username") }, enabled = false)
+            OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+            OutlinedTextField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = { Text("Confirm Password") })
+            OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }) }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = {
+                    if (password == confirmPassword) {
+                        viewModel.updateUser(username, password, email)
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Save Changes")
+            }
+
+            Button(
+                onClick = { showDialog = true },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Delete Profile", color = Color.White)
+            }
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Confirm Deletion") },
+                text = { Text("Are you sure you want to delete your profile?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            user?.id?.let { viewModel.deleteUser(it) }
+                            navController.navigate("login")
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+                    ) {
+                        Text("Delete", color = Color.White)
+                    }
+                },
+                dismissButton = { Button(onClick = { showDialog = false }) { Text("Cancel") } }
+            )
+        }
+
+        LazyColumn {
+            items(allUsers.filter { it.username != username }) { user ->
+            Card(modifier = Modifier.fillMaxWidth().padding(8.dp), elevation = 6.dp) {
+                    Column(modifier = Modifier.padding(8.dp)) {
+                        Text(text = "Username: ${user.username}")
+                        Text(text = "Email: ${user.email}")
+                        Text(text = "Role: ${user.role}")
+
+                        Row {
+                            IconButton(onClick = { showDialog = true }) {
+                                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                            }
+                            IconButton(onClick = { user.id?.let { viewModel.changeRole(it) } }) {
+                                Icon(imageVector = Icons.Default.Edit, contentDescription = "Change Role", tint = Color.Blue)
+                            }
+                            if (showDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showDialog = false },
+                                    title = { Text("Confirm Deletion") },
+                                    text = { Text("Are you sure you want to delete this profile?") },
+                                    confirmButton = {
+                                        Button(
+                                            onClick = {
+                                                user?.id?.let { viewModel.deleteUser(it) }
+
+                                            },
+                                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+                                        ) {
+                                            Text("Delete", color = Color.White)
+                                        }
+                                    },
+                                    dismissButton = { Button(onClick = { showDialog = false }) { Text("Cancel") } }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

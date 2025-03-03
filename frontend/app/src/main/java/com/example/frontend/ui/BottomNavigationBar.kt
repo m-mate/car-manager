@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomNavigationBar(navController: NavController, context: Context) {
-    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-    val carId = sharedPreferences.getInt("carId", 0)
+    //val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    //val carId = sharedPreferences.getInt("carId", 0)
 
 
         Box(

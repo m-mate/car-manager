@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.frontend.RetrofitClient
 import com.example.frontend.CarApiService
@@ -27,7 +28,7 @@ import com.example.frontend.model.Route
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+/*
 @Composable
 fun RoutesScreen(navController: NavController, carId: Int) {
     val context = LocalContext.current
@@ -98,6 +99,8 @@ fun RoutesScreen(navController: NavController, carId: Int) {
         }
     }
 }
+*/
+
 
 @Composable
 fun RouteItem(route: Route, navController: NavController, onDelete: (Int) -> Unit) {
@@ -155,7 +158,7 @@ fun RouteItem(route: Route, navController: NavController, onDelete: (Int) -> Uni
         }
     }
 }
-
+/*
 private fun deleteRoute(context: Context, routeList: MutableList<Route>, routeId: Int, navController: NavController) {
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val token = sharedPreferences.getString("jwt_token", null)
@@ -251,6 +254,80 @@ private fun refreshRoutes(navController: NavController, context: Context, carId:
             Log.e("Error", "Error occurred: ${t.message}", t)
         }
     })
+}*/
+
+
+@Composable
+fun RoutesScreen(navController: NavController, carId: Int, viewModel: RoutesViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val username = sharedPreferences.getString("username", null)
+
+    val routes by viewModel.routes.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    LaunchedEffect(carId) {
+        if (!username.isNullOrEmpty()) {
+            viewModel.fetchRoutes(carId)
+        } else {
+            Toast.makeText(context, "Please log in again.", Toast.LENGTH_SHORT).show()
+            navController.navigate("login") {
+                popUpTo("dashboard") { inclusive = true }
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colors.primary,
+            elevation = 8.dp,
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "My Routes",
+                    style = MaterialTheme.typography.h6,
+                    color = MaterialTheme.colors.onPrimary
+                )
+
+                Button(
+                    onClick = { username?.let { viewModel.refreshRoutes(it, carId) } },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
+                ) {
+                    Icon(Icons.Filled.Refresh, contentDescription = "Refresh Routes", tint = MaterialTheme.colors.onSecondary)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(routes) { route ->
+                RouteItem(
+                    route = route,
+                    navController = navController,
+                    onDelete = { viewModel.deleteRoute(it) }
+                )
+            }
+        }
+
+        if (routes.isEmpty()) {
+            Spacer(modifier = Modifier.weight(1f))
+            Text("No routes available", fontSize = 18.sp, style = MaterialTheme.typography.body1)
+        }
+
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
 }
-
-

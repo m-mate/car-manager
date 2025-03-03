@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.frontend.CarApiService
 import com.example.frontend.RetrofitClient
@@ -40,6 +41,114 @@ import retrofit2.Response
 import java.text.DecimalFormat
 
 
+@Composable
+fun DashboardScreen(navController: NavHostController, viewModel: DashboardViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+
+    val sharedPreferences = remember { context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE) }
+    val token = sharedPreferences.getString("jwt_token", null)
+    val vin = sharedPreferences.getString("vin", null)
+
+    val carData by viewModel.carData.collectAsState()
+
+    val activity = context as? android.app.Activity
+
+    DisposableEffect(Unit) {
+        activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        onDispose {
+            activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    if (token.isNullOrEmpty() || vin.isNullOrEmpty()) {
+        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchCarData()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        if (isPortrait) {
+            // Portrait layout
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                modifier = Modifier
+                    .background(
+                        color = Color(0xff242424),
+                        shape = RoundedCornerShape(150.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                val animatedSpeed by animateFloatAsState(
+                    targetValue = carData?.speed?.toFloat() ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                SpeedometerView(speed = animatedSpeed)
+
+                Text(
+                    text = "Fuel Rate: ${carData?.fuelRate ?: 0}l/100km",
+                    color = Color.White
+                )
+                Text(
+                    text = "Coolant Temp: ${carData?.coolantTemp ?: 0}°C",
+                    color = Color.White
+                )
+
+                val animatedRPM by animateFloatAsState(
+                    targetValue = carData?.rpm?.div(1000f) ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                RPMView(rpm = animatedRPM)
+            }
+        } else {
+            // Landscape layout
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color(0xff242424), shape = RoundedCornerShape(150.dp)),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val animatedSpeed by animateFloatAsState(
+                    targetValue = carData?.speed?.toFloat() ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                SpeedometerView(speed = animatedSpeed)
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Fuel Rate: ${carData?.fuelRate ?: 0}l/100km",
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Coolant Temp: ${carData?.coolantTemp ?: 0}°C",
+                        color = Color.White
+                    )
+                }
+
+                val animatedRPM by animateFloatAsState(
+                    targetValue = carData?.rpm?.div(1000f) ?: 0f,
+                    animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                )
+                RPMView(rpm = animatedRPM)
+            }
+        }
+    }
+}
+
+/*
 @Composable
 fun DashboardScreen(navController: NavHostController) {
     var carData by remember { mutableStateOf<CarDataLive?>(null) }
@@ -154,7 +263,7 @@ fun DashboardScreen(navController: NavHostController) {
         }
     }
 }
-
+*/
 @Composable
 fun SpeedometerView(speed: Float) {
         Gauge(
@@ -249,7 +358,7 @@ fun defaultGaugeStyle(): GaugeStyle {
         )
     )
 }
-
+/*
 fun fetchCarData(context: Context, token: String, vin: String, callback: (CarDataLive) -> Unit) {
 
 
@@ -275,5 +384,5 @@ fun fetchCarData(context: Context, token: String, vin: String, callback: (CarDat
             Log.e("fetchCarData", "Failed to fetch car data: ${t.message}", t)
         }
     })
-}
+}*/
 

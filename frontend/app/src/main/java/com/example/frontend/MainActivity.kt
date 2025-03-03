@@ -1,5 +1,6 @@
 package com.example.frontend
 
+import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -26,6 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -37,16 +40,27 @@ import com.example.frontend.ui.register.RegisterScreen
 import com.example.frontend.ui.carlist.CarListScreen
 import com.example.frontend.ui.cars.AddCarScreen
 import com.example.frontend.ui.dashboard.DashboardScreen
+import com.example.frontend.ui.login.LoginViewModel
+import com.example.frontend.ui.login.LoginViewModelFactory
 import com.example.frontend.ui.login.ServerScreen
 import com.example.frontend.ui.routes.RouteDetailsScreen
 import com.example.frontend.ui.routes.RoutesScreen
 import com.example.frontend.ui.user.UserScreen
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
+import kotlin.math.log
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate executed")
 
+        val application = application as Application  // ✅ Get the real Application instance
+        val loginViewModel: LoginViewModel = ViewModelProvider(
+            this,
+            LoginViewModelFactory(application)
+        )[LoginViewModel::class.java]
 
         setContent {
    
@@ -84,7 +98,8 @@ fun MainNavigation() {
     var showBackButton by remember { mutableStateOf(false) }
     var showMenuButton by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
-
+    val application = LocalContext.current.applicationContext as Application
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(application)) // ✅ Correct usage
 
 
 
@@ -143,6 +158,10 @@ fun MainNavigation() {
                                 }
                                 DropdownMenuItem(onClick = {
                                     menuExpanded = false
+
+                                    val sharedPreferences = application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                                    sharedPreferences.edit().remove("server_address").apply()
+
                                     navController.navigate("server") {
                                         popUpTo("server") {
                                             inclusive = true
@@ -166,7 +185,7 @@ fun MainNavigation() {
             NavHost(
                 navController = navController,
                 startDestination = startDestination,
-                modifier = Modifier.padding(innerPadding) // Ensure content is not hidden
+                modifier = Modifier.padding(innerPadding)
             ) {
                 composable("server") {
                     showBackButton = false; showBottomNav = false; ServerScreen(
@@ -179,9 +198,10 @@ fun MainNavigation() {
                 }
                 //composable("notifications") { NotificationsScreen(navController) }
                 composable("login") {
-                    showBottomNav = false; showMenuButton = false; LoginScreen(
-                    navController
-                )
+                    showBottomNav = false
+                    showMenuButton = false
+                    showBackButton = false
+                    LoginScreen(navController)
                 }
                 composable("register") { RegisterScreen(navController) }
                 composable("carList") {

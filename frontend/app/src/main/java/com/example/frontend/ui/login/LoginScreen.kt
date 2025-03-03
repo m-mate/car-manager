@@ -1,5 +1,6 @@
 package com.example.frontend.ui.login
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -14,6 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.frontend.CarApiService
 import com.example.frontend.RetrofitClient
 import com.example.frontend.model.User
@@ -21,6 +25,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+/*
 @Composable
 fun LoginScreen(navController: androidx.navigation.NavHostController) {
     var username by remember { mutableStateOf("") }
@@ -98,4 +103,62 @@ fun handleLogin(username: String, password: String, context: Context, navControl
             Toast.makeText(context, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
         }
     })
+}*/
+@Composable
+fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val loginState by viewModel.loginState.collectAsState()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            is LoginState.Success -> {
+                navController.navigate("carList") { popUpTo(0) { inclusive = true } }
+            }
+            is LoginState.Error -> {
+                val errorMessage = (loginState as LoginState.Error).message
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { viewModel.login(username, password, context) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = loginState !is LoginState.Loading
+        ) {
+            Text(if (loginState is LoginState.Loading) "Logging in..." else "Login")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        TextButton(onClick = { navController.navigate("register") }) {
+            Text("Don't have an account? Register")
+        }
+    }
 }
