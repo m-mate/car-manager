@@ -43,6 +43,18 @@ fun CarListScreen(navController: NavController, viewModel: CarListViewModel = hi
         }
     }
 
+    LaunchedEffect(errorMessage) {
+        if (errorMessage == "Unauthorized access. Please log in again.") {
+            navController.navigate("login") {
+                popUpTo("dashboard") { inclusive = true }
+            }
+        }else if (errorMessage == "Server error. Please try again later."){
+            navController.navigate("server") {
+                popUpTo("dashboard") { inclusive = true }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

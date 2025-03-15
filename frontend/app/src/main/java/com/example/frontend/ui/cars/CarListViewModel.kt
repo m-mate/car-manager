@@ -42,15 +42,22 @@ class CarListViewModel @Inject constructor(
             try {
                 val response = apiService.getCarsByUser(username, authToken)
 
-                if (response.isSuccessful) {
-                    _carList.value = response.body() ?: emptyList() // ✅ Ensure empty list if null
-                } else {
-                    _errorMessage.value = "Failed to fetch cars: ${response.message()}"
-                    _carList.value = emptyList() // ✅ Ensure safe default value
+                when {
+                    response.isSuccessful -> {
+                        _carList.value = response.body() ?: emptyList() // ✅ Ensure empty list if null
+                    }
+                    response.code() == 401 -> {
+                        _errorMessage.value = "Unauthorized access. Please log in again."
+                        _carList.value = emptyList()
+                    }
+                    else -> {
+                        _errorMessage.value = "Failed to fetch cars: ${response.message()}"
+                        _carList.value = emptyList()
+                    }
                 }
 
             } catch (e: Exception) {
-                _errorMessage.value = "Failed to fetch cars: ${e.message}"
+                _errorMessage.value = "Server error. Please try again later."
                 _carList.value = emptyList()
             }
         }
