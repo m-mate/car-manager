@@ -74,7 +74,7 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int, viewModel: Ro
 
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         RouteInfoRow("Avg Speed", "${details.route.avgSpeed} km/h", "Distance", "${details.route.distanceTraveled} km")
-                        RouteInfoRow("Fuel Consumption", "${details.route.avgFuelConsumption} L/100km", "Fuel Used", "${details.route.fuelUsed} L")
+                        RouteInfoRow("Fuel Consumption", "${details.route.avgFuelConsumption} L/100km", "Fuel Used", "${"%.2f".format(details.route.fuelUsed)} L")
                         RouteInfoRow("Duration", calculateDuration(details.route.startTime, details.route.finishTime), "Data Count", details.carData.size.toString())
                     }
                 }
