@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,11 +29,13 @@ import com.example.frontend.model.Route
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
-fun RouteItem(route: Route, navController: NavController, onDelete: (Int) -> Unit) {
+fun RouteItem(index: Int, route: Route, navController: NavController, onDelete: (Int) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
 
     if (showDialog) {
@@ -74,11 +77,11 @@ fun RouteItem(route: Route, navController: NavController, onDelete: (Int) -> Uni
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = "Route ID: ${route.id}", fontSize = 18.sp, style = MaterialTheme.typography.h6)
+                Text(text = "Route #${index + 1}", fontSize = 18.sp, style = MaterialTheme.typography.h6)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Start: ${route.startTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
+                Text( text = "Start: ${formatDateTime(route.startTime)}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "End: ${route.finishTime}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
+                Text(text = "End: ${formatDateTime(route.finishTime)}", fontSize = 14.sp, style = MaterialTheme.typography.body2)
             }
 
             IconButton(onClick = { showDialog = true }) {
@@ -145,8 +148,9 @@ fun RoutesScreen(navController: NavController, carId: Int, viewModel: RoutesView
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(routes) { route ->
+            itemsIndexed(routes) {index, route ->
                 RouteItem(
+                    index = index,
                     route = route,
                     navController = navController,
                     onDelete = { viewModel.deleteRoute(it) }
@@ -162,5 +166,16 @@ fun RoutesScreen(navController: NavController, carId: Int, viewModel: RoutesView
         errorMessage?.let {
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         }
+    }
+}
+
+fun formatDateTime(startTime: String): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()) // Adjust as per input
+    val outputFormat = SimpleDateFormat("yyyy.MM.dd:HH.mm", Locale.getDefault())
+    return try {
+        val date = inputFormat.parse(startTime)
+        date?.let { outputFormat.format(it) } ?: "Invalid date"
+    } catch (e: Exception) {
+        "Invalid date"
     }
 }

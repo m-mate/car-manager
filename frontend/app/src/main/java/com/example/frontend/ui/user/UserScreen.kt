@@ -521,6 +521,7 @@ fun UserScreen(navController: NavHostController, viewModel: UserViewModel = hilt
                                         Button(
                                             onClick = {
                                                 user?.id?.let { viewModel.deleteUser(it) }
+                                                showDialog = false
 
                                             },
                                             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)

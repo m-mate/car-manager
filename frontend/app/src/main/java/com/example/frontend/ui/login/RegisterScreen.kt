@@ -37,7 +37,7 @@ fun RegisterScreen(navController: NavHostController, registerViewModel: Register
         registrationStatus?.let { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             if (message == "Success") {
-                navController.navigate("login") // ✅ Navigation in View
+                navController.navigate("login")
             }
         }
     }

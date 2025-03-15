@@ -23,12 +23,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
         User registeredUser = userService.register(user);
         if (registeredUser != null) {
-            return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+            return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
         }else {
-            return new ResponseEntity<>( HttpStatus.CONFLICT);
+            return new ResponseEntity<>("Username already taken. Please choose another one.", HttpStatus.CONFLICT);
         }
 
     }

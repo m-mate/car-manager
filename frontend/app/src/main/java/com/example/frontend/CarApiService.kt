@@ -5,6 +5,7 @@ import com.example.frontend.model.CarDataLive
 import com.example.frontend.model.Route
 import com.example.frontend.model.RouteDetails
 import com.example.frontend.model.User
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -44,7 +45,7 @@ interface CarApiService {
     suspend fun getAllRoutes(@Query("username") username: String, @Query("carId") carId: Int, @Header("Authorization") token: String): List<Route>
 
     @POST("users/register")
-    suspend fun registerUser(@Body user: User): Response<User>
+    suspend fun registerUser(@Body user: User): Response<ResponseBody>
 
     @GET("users/{username}")
     suspend fun getUser(@Path("username") username: String,@Header("Authorization") token: String): Response<User>

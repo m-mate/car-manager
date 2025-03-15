@@ -42,11 +42,18 @@ class RegisterViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val response = apiService.registerUser(user) // Use Retrofit's suspend function
-                if (response.isSuccessful) {
-                    _registrationStatus.value = "Success"
-                } else {
-                    _registrationStatus.value = "Failed: ${response.message()}"
+                val response = apiService.registerUser(user)
+
+                when {
+                    response.isSuccessful -> {
+                        _registrationStatus.value = "Success"
+                    }
+                    response.code() == 409 -> {
+                        _registrationStatus.value = "Username already taken. Please choose another one."
+                    }
+                    else -> {
+                        _registrationStatus.value = "Failed: ${response.message()}"
+                    }
                 }
             } catch (e: Exception) {
                 _registrationStatus.value = "Error: ${e.message}"
