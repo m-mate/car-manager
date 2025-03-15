@@ -41,7 +41,6 @@ import com.example.frontend.ui.carlist.CarListScreen
 import com.example.frontend.ui.cars.AddCarScreen
 import com.example.frontend.ui.dashboard.DashboardScreen
 import com.example.frontend.ui.login.LoginViewModel
-import com.example.frontend.ui.login.LoginViewModelFactory
 import com.example.frontend.ui.login.ServerScreen
 import com.example.frontend.ui.routes.RouteDetailsScreen
 import com.example.frontend.ui.routes.RoutesScreen
@@ -56,11 +55,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate executed")
 
-        val application = application as Application  // ✅ Get the real Application instance
-        val loginViewModel: LoginViewModel = ViewModelProvider(
-            this,
-            LoginViewModelFactory(application)
-        )[LoginViewModel::class.java]
+
+
 
         setContent {
    
@@ -99,7 +95,7 @@ fun MainNavigation() {
     var showMenuButton by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
     val application = LocalContext.current.applicationContext as Application
-    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(application)) // ✅ Correct usage
+    //val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(application)) // ✅ Correct usage
 
 
 

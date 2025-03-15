@@ -20,6 +20,8 @@ class DashboardViewModel @Inject constructor(
     private val apiService: CarApiService
 ) : AndroidViewModel(application) {
 
+    var isFetching = true
+
     private val sharedPreferences: SharedPreferences =
         application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
 
@@ -42,7 +44,7 @@ class DashboardViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                while (true) { // Keep fetching data every second
+                while (isFetching) { // Keep fetching data every second
                     val response = apiService.getCarStatus(vin, authToken)
 
                     if (response.isSuccessful) {
@@ -57,5 +59,8 @@ class DashboardViewModel @Inject constructor(
                 _errorMessage.value = "Failed to fetch car data: ${e.message}"
             }
         }
+    }
+    fun stopFetching() {
+        isFetching = false
     }
 }

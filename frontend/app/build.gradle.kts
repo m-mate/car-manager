@@ -65,6 +65,7 @@ dependencies {
     implementation("io.github.ehsannarmani:compose-charts:0.1.1")
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.viewbinding)
+    implementation(libs.core.ktx)
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.14")
 
     // Activity Compose

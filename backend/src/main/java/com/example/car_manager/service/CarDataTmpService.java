@@ -40,15 +40,9 @@ public class CarDataTmpService {
 
     @Transactional
     public void checkForRemainingData(Car car){
-
-
-
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(car.getVin());
-
             double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
-
             int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
-
             double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
 
             CarData carData = new CarData();
@@ -58,29 +52,20 @@ public class CarDataTmpService {
             carData.setTimeStamp(carDataTmpList.getLast().getTimeStamp());
             carData.setCar(car);
 
-
             carDataTmpRepository.deleteAllByCar_Vin(car.getVin());
-
             carDataRepository.save(carData);
-
-
     }
 
 
     @Transactional
     public CarDataTmp saveCarDataTmp(CarDataTmp carDataTmp) {
-
-
-
         try {
-
             carDataTmpRepository.save(carDataTmp);
             List<CarDataTmp> carDataTmpList = carDataTmpRepository.findByCar_Vin(carDataTmp.getCar().getVin());
 
             if (carDataTmpList.size() >= 60) {
                 double avgSpeed = carDataTmpList.stream().mapToDouble(CarDataTmp::getSpeed).average().orElse(0.0);
                 int avgRpm = (int) carDataTmpList.stream().mapToInt(CarDataTmp::getRpm).average().orElse(0);
-
                 double avgFuelRate = carDataTmpList.stream().mapToDouble(CarDataTmp::getFuelRate).average().orElse(0.0);
 
                 CarData carData = new CarData();
@@ -90,16 +75,10 @@ public class CarDataTmpService {
                 carData.setTimeStamp(carDataTmp.getTimeStamp()); 
                 carData.setCar(carDataTmp.getCar());
 
-
-
-
                 carDataTmpRepository.deleteAllByCar_Vin(carDataTmp.getCar().getVin());
-
                 carDataRepository.save(carData);
             }
-
             return carDataTmp;
-
         } catch (DataAccessException e) {
             throw new RuntimeException("Database error occurred", e);
         } catch (NullPointerException e) {

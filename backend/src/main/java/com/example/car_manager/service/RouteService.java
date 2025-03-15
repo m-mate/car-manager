@@ -79,7 +79,6 @@ public class RouteService {
                 currentRoute.setCar(car);
                 currentRoute.setUser(user);
 
-                // Reset counters for new route
                 count = 0;
                 speedSum = 0;
                 fuelRateSum = 0;
@@ -106,11 +105,8 @@ public class RouteService {
             currentRoute.setDistanceTraveled((int) (avgSpeed * hours));
             currentRoute.setAvgFuelConsumption(avgFuelRate);
             currentRoute.setFuelUsed(avgFuelRate * hours);
-
             newRoutes.add(currentRoute);
         }
-
-        // Persist updates
         carDataRepository.saveAll(carDataList);
         routeRepository.saveAll(newRoutes);
     }

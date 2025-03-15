@@ -54,35 +54,16 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    /*
-    fun registerUser(username: String, email: String, password: String, navController: NavHostController) {
-        if (!validateInputs(username, email, password)) {
-            _registrationStatus.value = "Invalid inputs!"
-            return
-        }
 
-        val user = User(username, password, email)
-        val apiService = RetrofitClient.create(getApplication<Application>().applicationContext, "").create(CarApiService::class.java)
-
-        apiService.registerUser(user).enqueue(object : Callback<User> {
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                if (response.isSuccessful) {
-                    //Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
-                    navController.navigate("login")
-                } else {
-                    //Toast.makeText(context, "Registration failed! ${response.message()}", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                //Toast.makeText(context, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
-    }})}
-*/
     private fun validateInputs(username: String, email: String, password: String): Boolean {
         if (username.isEmpty() || email.isEmpty() || password.isEmpty()) return false
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) return false
+        if (!isValidEmail(email)) return false
         if (password.length < 6) return false
         return true
+    }
+
+    fun isValidEmail(email: String): Boolean {
+        return email.contains("@") && email.contains(".")
     }
 }
 

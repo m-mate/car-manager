@@ -85,67 +85,6 @@ fun RouteDetailsScreen(navController: NavController, routeId: Int, viewModel: Ro
     }
 }
 
-/*
-@Composable
-fun RouteDetailsScreen(navController: NavController, routeId: Int) {
-    val context = LocalContext.current
-    val routeDetails = remember { mutableStateOf<RouteDetails?>(null) }
-
-
-    LaunchedEffect(routeId) {
-        fetchRouteDetails(context, routeId, routeDetails)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .background(color = Color(0xFFDEE4E7))
-            .verticalScroll(rememberScrollState())
-    ) {
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        routeDetails.value?.let { details ->
-
-            RouteChart(carData = details.carData)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                elevation = 8.dp,
-                backgroundColor = Color.White
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Route Summary",
-                        fontSize = 20.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        RouteInfoRow("Avg Speed", "${details.route.avgSpeed} km/h", "Distance", "${details.route.distanceTraveled} km")
-                        RouteInfoRow("Fuel Consumption", "${details.route.avgFuelConsumption} L/100km", "Fuel Used", "${details.route.fuelUsed} L")
-                        RouteInfoRow( "Duration", calculateDuration(details.route.startTime, details.route.finishTime), "Data Count",details.carData.size.toString() )
-                    }
-                }
-            }
-        } ?: run {
-            Text("Loading route details...", fontSize = 18.sp)
-        }
-    }
-}*/
 
 @Composable
 fun RouteInfoRow(label1: String, value1: String, label2: String, value2: String) {
@@ -165,39 +104,7 @@ fun RouteInfoItem(label: String, value: String) {
         Text(value)
     }
 }
-/*
-private fun fetchRouteDetails(context: Context, routeId: Int, routeDetails: MutableState<RouteDetails?>) {
-    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-    val token = sharedPreferences.getString("jwt_token", null)
 
-
-    if (token.isNullOrEmpty() ) {
-        Toast.makeText(context, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
-        return
-    }
-
-    val apiService = RetrofitClient.create(context, token).create(CarApiService::class.java)
-    apiService.getRouteDetails(routeId).enqueue(object : Callback<RouteDetails> {
-        override fun onResponse(call: Call<RouteDetails>, response: Response<RouteDetails>) {
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    routeDetails.value = it
-                }
-            } else {
-                Toast.makeText(context, "Failed to load route details.", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        override fun onFailure(call: Call<RouteDetails>, t: Throwable) {
-            Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_LONG).show()
-            Log.e("Error", "Error occurred: ${t.message}", t)
-        }
-    })
-}
-
-
-
-*/
 
 
 

@@ -3,9 +3,7 @@ package com.example.frontend.ui.routes
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontend.CarApiService
 import com.example.frontend.model.Route
@@ -21,7 +19,7 @@ class RoutesViewModel @Inject constructor(
     private val apiService: CarApiService
 ) : AndroidViewModel(application) {
 
-    private val _routes = MutableStateFlow<List<Route>>(emptyList())
+    val _routes = MutableStateFlow<List<Route>>(emptyList())
     val routes: StateFlow<List<Route>> = _routes
 
     private val _errorMessage = MutableStateFlow<String?>(null)
@@ -30,12 +28,13 @@ class RoutesViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences =
         application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
 
-    val username = sharedPreferences.getString("username", null)
-    val token = sharedPreferences.getString("jwt_token", null)
+
 
 
 
     fun fetchRoutes(carId: Int) {
+        val username = sharedPreferences.getString("username", null)
+        val token = sharedPreferences.getString("jwt_token", null)
         if (username.isNullOrEmpty() || token.isNullOrEmpty()) {
             _errorMessage.value = "User not logged in. Please log in again."
             return
@@ -52,6 +51,7 @@ class RoutesViewModel @Inject constructor(
     }
 
     fun deleteRoute(routeId: Int) {
+        val token = sharedPreferences.getString("jwt_token", null)
         if ( token.isNullOrEmpty()) {
             _errorMessage.value = "User not logged in. Please log in again."
             return
@@ -68,6 +68,7 @@ class RoutesViewModel @Inject constructor(
     }
 
     fun refreshRoutes(username: String, carId: Int) {
+        val token = sharedPreferences.getString("jwt_token", null)
         if ( token.isNullOrEmpty()) {
             _errorMessage.value = "User not logged in. Please log in again."
             return

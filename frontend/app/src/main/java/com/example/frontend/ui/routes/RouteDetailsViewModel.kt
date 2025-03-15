@@ -28,9 +28,10 @@ class RouteDetailsViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences =
         application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
 
-    val token = sharedPreferences.getString("jwt_token", null)
+
 
     fun fetchRouteDetails(routeId: Int) {
+        val token = sharedPreferences.getString("jwt_token", null)
         if (token.isNullOrEmpty()) {
             _errorMessage.value = "User not logged in. Please log in again."
             return

@@ -20,7 +20,7 @@ class CarListViewModel @Inject constructor(
     private val apiService: CarApiService
 ) : AndroidViewModel(application) {
 
-    private val _carList = MutableStateFlow<List<Car>>(emptyList()) // ✅ StateFlow for UI state
+    val _carList = MutableStateFlow<List<Car>>(emptyList()) // ✅ StateFlow for UI state
     val carList: StateFlow<List<Car>> = _carList
 
     private val _errorMessage = MutableStateFlow<String?>(null) // Error handling

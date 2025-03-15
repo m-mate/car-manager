@@ -20,53 +20,56 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    application: Application
+    application: Application,
+    private val apiService: CarApiService
 ) : AndroidViewModel(application) {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
-
-    fun login(username: String, password: String, context: Context) {
-        if (username.isEmpty() || password.isEmpty()) return
+    fun login(username: String, password: String) {
+        if (username.isEmpty() || password.isEmpty()) {
+            _loginState.value = LoginState.Error("Invalid inputs!")
+            return
+        }
 
         val user = User(username, password)
-        val apiService = RetrofitClient.create(getApplication<Application>().applicationContext, "").create(CarApiService::class.java)
 
-        apiService.loginUser(user).enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
+        viewModelScope.launch {
+            try {
+                val response = apiService.loginUser(user) // Assuming a suspend function
                 if (response.isSuccessful) {
                     val token = response.body()
                     if (!token.isNullOrEmpty()) {
-                        saveUserData(context, username, token)
+                        saveUserData(username, token)
                         _loginState.value = LoginState.Success
+
                     } else {
                         _loginState.value = LoginState.Error("Empty token received")
                     }
                 } else {
                     _loginState.value = LoginState.Error("Invalid credentials or server error")
                 }
+            } catch (e: Exception) {
+                _loginState.value = LoginState.Error("Error: ${e.message}")
             }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                _loginState.value = LoginState.Error("An error occurred: ${t.message}")
-            }
-        })
+        }
     }
 
-    private fun saveUserData(context: Context, username: String, token: String) {
-        val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    private fun saveUserData(username: String, token: String) {
+        val sharedPreferences = getApplication<Application>()
+            .getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPreferences.edit()) {
             putString("jwt_token", token)
             putString("username", username)
             apply()
         }
     }
-}
 
+    sealed class LoginState {
+        object Idle : LoginState()
+        object Loading : LoginState()
+        object Success : LoginState()
+        data class Error(val message: String) : LoginState()
+    }
 
-sealed class LoginState {
-    object Idle : LoginState()
-    object Loading : LoginState()
-    object Success : LoginState()
-    data class Error(val message: String) : LoginState()
 }

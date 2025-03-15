@@ -32,7 +32,7 @@ interface CarApiService {
 
 
     @POST("/users/login")
-    fun loginUser(@Body user: User): Call<String>
+    suspend fun loginUser(@Body user: User): Response<String>
 
     @GET("cars/user/{username}")
     suspend fun getCarsByUser(@Path("username") username: String,  @Header("Authorization") token: String): Response<List<Car>?>
